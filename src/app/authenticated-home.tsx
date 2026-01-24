@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { motion, useReducedMotion } from "motion/react"
 import { createClient } from "@/utils/supabase/client"
 import { useRouter } from "next/navigation"
-import { UserIcon, LogOutIcon, SparklesIcon } from "lucide-react"
+import { UserIcon, LogOutIcon, SparklesIcon, SettingsIcon } from "lucide-react"
 
 export default function AuthenticatedHome({ user, username, fullName }: { user: any, username: string, fullName?: string | null }) {
     const router = useRouter()
@@ -27,7 +27,7 @@ export default function AuthenticatedHome({ user, username, fullName }: { user: 
             {/* Simple Nav */}
             <nav className="w-full max-w-7xl mx-auto px-6 py-4 flex justify-between items-center z-20">
                 <span className="text-xl font-bold tracking-tighter text-primary">ImagineOS</span>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3 md:gap-4">
                     <Button
                         variant="ghost"
                         size="sm"
@@ -35,7 +35,16 @@ export default function AuthenticatedHome({ user, username, fullName }: { user: 
                         className="rounded-full gap-2"
                     >
                         <UserIcon className="size-4" />
-                        Profile
+                        <span className="hidden sm:inline">Profile</span>
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => router.push(`/settings/profile`)}
+                        className="rounded-full gap-2"
+                    >
+                        <SettingsIcon className="size-4" />
+                        <span className="hidden sm:inline">Settings</span>
                     </Button>
                     <Button
                         variant="ghost"

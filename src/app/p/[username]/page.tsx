@@ -13,9 +13,9 @@ import {
     BriefcaseIcon,
     GlobeIcon,
     Edit3Icon,
-    UserIcon
+    UserIcon,
+    SettingsIcon
 } from "lucide-react"
-import { EditProfileDialog } from "@/components/profile/edit-profile-dialog"
 
 export default async function ProfilePage({
     params,
@@ -103,12 +103,12 @@ export default async function ProfilePage({
                             </p>
                         </div>
                         {isOwner && (
-                            <EditProfileDialog profile={profile}>
-                                <Button variant="outline" size="sm" className="gap-2 rounded-full hidden md:flex">
+                            <Link href="/settings/profile">
+                                <Button variant="outline" size="sm" className="gap-2 rounded-full hidden md:flex hover:bg-muted/50 transition-colors">
                                     <Edit3Icon className="size-4" />
                                     Edit Profile
                                 </Button>
-                            </EditProfileDialog>
+                            </Link>
                         )}
                     </div>
 
@@ -167,7 +167,7 @@ export default async function ProfilePage({
             {/* Mobile FAB for Edit */}
             {
                 isOwner && (
-                    <EditProfileDialog profile={profile}>
+                    <Link href="/settings/profile">
                         <Button
                             size="icon"
                             className="fixed bottom-6 right-6 size-14 rounded-full shadow-lg md:hidden z-50 mb-[env(safe-area-inset-bottom)]"
@@ -175,7 +175,7 @@ export default async function ProfilePage({
                             <Edit3Icon className="size-6" />
                             <span className="sr-only">Edit Profile</span>
                         </Button>
-                    </EditProfileDialog>
+                    </Link>
                 )
             }
         </div >
