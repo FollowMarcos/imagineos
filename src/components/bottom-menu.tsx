@@ -56,38 +56,13 @@ const BottomMenu = () => {
 
   const startGeneration = () => {
     setIsGenerating(true);
-    // Initialize 4 items as pending
+    // Mockup: Show all 4 states simultaneously to verify design and colors
     setGeneratedItems([
-      { id: 0, status: 'pending' },
-      { id: 1, status: 'pending' },
-      { id: 2, status: 'pending' },
+      { id: 0, status: 'success', referenceImage: "https://picsum.photos/id/64/100/100" },
+      { id: 1, status: 'failed' },
+      { id: 2, status: 'generating' }, // Spinning orange
       { id: 3, status: 'pending' },
     ]);
-
-    // Simulate sequential generation
-    let currentIndex = 0;
-
-    const processItem = () => {
-      if (currentIndex >= 4) return;
-
-      // Set current to generating
-      setGeneratedItems(prev => prev.map((item, i) => i === currentIndex ? { ...item, status: 'generating' } : item));
-
-      // Wait random time then finish
-      setTimeout(() => {
-        // Randomly fail the 3rd item just to show off the state
-        const status = currentIndex === 2 ? 'failed' : 'success';
-
-        setGeneratedItems(prev => prev.map((item, i) => i === currentIndex ? { ...item, status } : item));
-
-        currentIndex++;
-        if (currentIndex < 4) {
-          processItem();
-        }
-      }, 1500 + Math.random() * 1000); // 1.5s - 2.5s per image
-    }
-
-    processItem();
   };
 
   // Close creative mode on click outside
@@ -124,7 +99,7 @@ const BottomMenu = () => {
             className="bg-background/80 backdrop-blur-xl border border-border/50 shadow-xl rounded-full pl-2 pr-2 py-2 flex items-center gap-3 pointer-events-auto"
           >
             {/* Thumbnail Previews (Mock) */}
-            <div className="flex -space-x-4 pl-1">
+            <div className="flex gap-3">
               {generatedItems.map((item, i) => (
                 <motion.div
                   key={item.id}
