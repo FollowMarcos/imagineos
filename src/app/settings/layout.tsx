@@ -149,7 +149,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
 
             {/* Main Content */}
             <main className="flex-1 relative pb-20">
-                <div className="max-w-5xl px-8 py-12 lg:px-16 lg:py-16">
+                <div className="max-w-5xl px-8 pt-10 pb-12 lg:px-16 lg:pt-10 lg:pb-16">
                     {children}
                 </div>
             </main>
