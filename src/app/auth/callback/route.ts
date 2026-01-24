@@ -16,18 +16,6 @@ export async function GET(request: Request) {
             const { data: { user } } = await supabase.auth.getUser()
             let redirectUrl = next
 
-            if (user) {
-                const { data: profile } = await supabase
-                    .from('profiles')
-                    .select('username')
-                    .eq('id', user.id)
-                    .single()
-
-                if (profile?.username) {
-                    redirectUrl = `/p/${profile.username}`
-                }
-            }
-
             // Harden: Use origin for redirection to prevent host spoofing
             return NextResponse.redirect(`${origin}${redirectUrl}`)
         }

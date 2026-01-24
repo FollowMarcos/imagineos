@@ -9,7 +9,7 @@ import { motion, Variants, useReducedMotion } from "motion/react"
 export default function LandingPageClient() {
     const shouldReduceMotion = useReducedMotion()
 
-    const handleLogin = async (provider: 'google' | 'twitter') => {
+    const handleLogin = async (provider: 'google' | 'x') => {
         const supabase = createClient()
         await supabase.auth.signInWithOAuth({
             provider,
@@ -85,7 +85,7 @@ export default function LandingPageClient() {
                     </Button>
                     <Button
                         variant="outline"
-                        onClick={() => handleLogin('twitter')}
+                        onClick={() => handleLogin('x')}
                         className="w-full h-12 rounded-full border border-border bg-transparent text-foreground hover:bg-accent font-medium text-base transition hover:scale-[1.02]"
                     >
                         <XIcon className="size-4 mr-2" />

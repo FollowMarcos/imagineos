@@ -132,17 +132,16 @@ export default async function ProfilePage({
                                 <span>{profile.location}</span>
                             </div>
                         )}
-                        {profile.website && (
+                        {profile.website && (profile.website.startsWith('http://') || profile.website.startsWith('https://')) && (
                             <a
                                 href={profile.website}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center gap-1.5 hover:text-primary transition-colors hover:underline"
-                                aria-label={`Visit website: ${profile.website}`}
+                                className="flex items-center gap-1.5 hover:text-primary transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-sm"
+                                aria-label={`Visit website: ${new URL(profile.website).hostname} (opens in a new tab)`}
                             >
-                                <GlobeIcon className="size-4" />
+                                <GlobeIcon className="size-4" aria-hidden="true" />
                                 <span>{new URL(profile.website).hostname}</span>
-                                <span className="sr-only">(opens in a new tab)</span>
                             </a>
                         )}
                         <div className="flex items-center gap-1.5">

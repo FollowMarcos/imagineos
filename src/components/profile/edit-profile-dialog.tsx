@@ -4,6 +4,7 @@ import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
 import { updateProfile, type ProfileUpdateData } from '@/actions/update-profile'
+import { resizeImage } from '@/lib/image-utils'
 import { Button } from '@/components/ui/button'
 import {
     Dialog,
@@ -58,26 +59,28 @@ export function EditProfileDialog({ profile, children }: { profile: Profile, chi
         const file = e.target.files?.[0]
         if (!file) return
 
-        // 5MB limit check 
-        if (file.size > 5 * 1024 * 1024) {
-            toast.error('File size too large! Please upload a file smaller than 5MB.')
-            return
-        }
-
         setIsUploading(true)
         try {
-            const fileExt = file.name.split('.').pop()
-            const fileName = `${profile.id}/${crypto.randomUUID()}.${fileExt}`
+            // Resize image based on target field
+            const isAvatar = field === 'avatar_url'
+            const optimizedBlob = await resizeImage(file, {
+                maxWidth: isAvatar ? 400 : 1200,
+                maxHeight: isAvatar ? 400 : 600,
+                quality: 0.8
+            })
+
+            const fileName = `${profile.id}/${crypto.randomUUID()}.jpg`
             const filePath = `${fileName}`
 
-            // Direct upload to Supabase Storage
+            // Direct upload optimized blob to Supabase Storage
             const { error: uploadError } = await supabase.storage
                 .from(bucket)
-                .upload(filePath, file)
+                .upload(filePath, optimizedBlob, {
+                    contentType: 'image/jpeg',
+                    upsert: true
+                })
 
-            if (uploadError) {
-                throw uploadError
-            }
+            if (uploadError) throw uploadError
 
             // Get Public URL
             const { data: { publicUrl } } = supabase.storage
@@ -85,9 +88,10 @@ export function EditProfileDialog({ profile, children }: { profile: Profile, chi
                 .getPublicUrl(filePath)
 
             setFormData(prev => ({ ...prev, [field]: publicUrl }))
+            toast.success(`${isAvatar ? 'Avatar' : 'Banner'} optimized and ready!`)
         } catch (error) {
             console.error('Error uploading image:', error)
-            toast.error('Error uploading image')
+            toast.error('Error processing or uploading image')
         } finally {
             setIsUploading(false)
         }
@@ -132,10 +136,11 @@ export function EditProfileDialog({ profile, children }: { profile: Profile, chi
                     {/* Images Section */}
                     <div className="space-y-4">
                         {/* Banner Upload */}
-                        <div className="relative h-32 w-full rounded-lg bg-muted overflow-hidden group border border-input cursor-pointer"
-                            onClick={() => bannerInputRef.current?.click()}>
+                        <button type="button" className="relative h-32 w-full rounded-lg bg-muted overflow-hidden group border border-input cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                            onClick={() => bannerInputRef.current?.click()}
+                            aria-label="Upload new banner">
                             {formData.banner_url ? (
-                                <img src={formData.banner_url} className="w-full h-full object-cover" alt="Banner" />
+                                <img src={formData.banner_url} className="w-full h-full object-cover" alt="Current banner profile" width={1200} height={400} />
                             ) : (
                                 <div className="flex items-center justify-center h-full text-muted-foreground">
                                     <UploadCloudIcon className="w-8 h-8 opacity-50" aria-hidden="true" />
@@ -151,14 +156,15 @@ export function EditProfileDialog({ profile, children }: { profile: Profile, chi
                                 accept="image/*"
                                 onChange={(e) => handleFileChange(e, 'avatars', 'banner_url')}
                             />
-                        </div>
+                        </button>
 
                         {/* Avatar Upload */}
                         <div className="-mt-12 ml-4 relative inline-block">
-                            <div className="h-24 w-24 rounded-full border-4 border-background bg-muted overflow-hidden relative group cursor-pointer"
-                                onClick={() => avatarInputRef.current?.click()}>
+                            <button type="button" className="h-24 w-24 rounded-full border-4 border-background bg-muted overflow-hidden relative group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                                onClick={() => avatarInputRef.current?.click()}
+                                aria-label="Upload new avatar">
                                 {formData.avatar_url ? (
-                                    <img src={formData.avatar_url} className="w-full h-full object-cover" alt="Avatar" />
+                                    <img src={formData.avatar_url} className="w-full h-full object-cover" alt="Current avatar profile" width={400} height={400} />
                                 ) : (
                                     <div className="flex items-center justify-center h-full bg-secondary">
                                         <Edit3Icon className="w-8 h-8 opacity-50" aria-hidden="true" />
@@ -167,7 +173,7 @@ export function EditProfileDialog({ profile, children }: { profile: Profile, chi
                                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                     <CameraIcon className="w-6 h-6 text-white" aria-hidden="true" />
                                 </div>
-                            </div>
+                            </button>
                             <input
                                 type="file"
                                 ref={avatarInputRef}
@@ -233,7 +239,7 @@ export function EditProfileDialog({ profile, children }: { profile: Profile, chi
                             <Textarea
                                 id="bio"
                                 rows={3}
-                                placeholder="Tell us about yourself..."
+                                placeholder="Tell us about yourself…"
                                 value={formData.bio || ''}
                                 onChange={e => setFormData({ ...formData, bio: e.target.value })}
                             />
