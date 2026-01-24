@@ -113,7 +113,7 @@ export function ProfileSettingsForm({ profile }: { profile: Profile }) {
 
     return (
         <form onSubmit={handleSubmit} className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <Card className="border-none shadow-none bg-transparent">
+            <Card className="border-none shadow-none bg-transparent py-0">
                 <CardHeader className="px-0 pt-0">
                     <CardTitle className="text-3xl font-bold tracking-tight">Public Profile</CardTitle>
                     <CardDescription className="text-lg">

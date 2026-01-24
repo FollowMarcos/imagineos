@@ -67,7 +67,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
                     onClick={() => setCollapsed(!collapsed)}
                     aria-expanded={!collapsed}
                     aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-                    className="absolute -right-4 top-10 z-50 h-8 w-8 rounded-full border border-border bg-background shadow-sm hover:scale-110 transition-transform hidden lg:flex"
+                    className="absolute -right-4 top-6 z-50 h-8 w-8 rounded-full border border-border bg-background shadow-sm hover:scale-110 transition-transform hidden lg:flex"
                 >
                     <ChevronLeftIcon className={cn("h-4 w-4 transition-transform duration-500", collapsed && "rotate-180")} aria-hidden="true" />
                 </Button>
@@ -149,7 +149,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
 
             {/* Main Content */}
             <main className="flex-1 relative pb-20">
-                <div className="max-w-5xl px-8 pt-10 pb-12 lg:px-16 lg:pt-10 lg:pb-16">
+                <div className="max-w-5xl px-8 pt-[22px] pb-12 lg:px-16 lg:pt-[22px] lg:pb-16">
                     {children}
                 </div>
             </main>
