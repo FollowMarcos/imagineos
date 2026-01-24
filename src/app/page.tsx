@@ -10,11 +10,11 @@ export default async function LandingPage() {
     if (user) {
         const { data: profile } = await supabase
             .from('profiles')
-            .select('username')
+            .select('username, full_name')
             .eq('id', user.id)
             .single()
 
-        return <AuthenticatedHome user={user} username={profile?.username || 'user'} />
+        return <AuthenticatedHome user={user} username={profile?.username || 'user'} fullName={profile?.full_name} />
     }
 
     return <LandingPageClient />

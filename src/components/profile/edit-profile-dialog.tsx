@@ -109,7 +109,13 @@ export function EditProfileDialog({ profile, children }: { profile: Profile, chi
             }
 
             setOpen(false)
-            router.refresh()
+
+            // Handle username change redirection
+            if (formData.username && formData.username !== profile.username) {
+                router.push(`/p/${formData.username}`)
+            } else {
+                router.refresh()
+            }
         } catch (error) {
             console.error('Error updating profile:', error)
             toast.error('Something went wrong')

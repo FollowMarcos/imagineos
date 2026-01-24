@@ -6,7 +6,7 @@ import { createClient } from "@/utils/supabase/client"
 import { useRouter } from "next/navigation"
 import { UserIcon, LogOutIcon, SparklesIcon } from "lucide-react"
 
-export default function AuthenticatedHome({ user, username }: { user: any, username: string }) {
+export default function AuthenticatedHome({ user, username, fullName }: { user: any, username: string, fullName?: string | null }) {
     const router = useRouter()
     const supabase = createClient()
     const shouldReduceMotion = useReducedMotion()
@@ -58,7 +58,7 @@ export default function AuthenticatedHome({ user, username }: { user: any, usern
                 >
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium border border-primary/20 mb-4">
                         <SparklesIcon className="size-4" aria-hidden="true" />
-                        Welcome Back, {username}
+                        Welcome Back, {fullName || username}
                     </div>
 
                     <h1 className="text-5xl md:text-7xl font-bold tracking-tighter text-balance max-w-3xl mx-auto leading-[1.1]">
