@@ -56,7 +56,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
             {/* Sidebar Container */}
             <aside
                 className={cn(
-                    "relative flex flex-col border-r border-border/40 bg-card/30 backdrop-blur-xl transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
+                    "sticky top-0 h-dvh flex flex-col border-r border-border/40 bg-card/30 backdrop-blur-xl transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] z-40",
                     collapsed ? "w-20" : "w-80"
                 )}
             >
@@ -148,7 +148,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 relative overflow-auto pb-20">
+            <main className="flex-1 relative pb-20">
                 <div className="max-w-5xl px-8 py-12 lg:px-16 lg:py-16">
                     {children}
                 </div>
