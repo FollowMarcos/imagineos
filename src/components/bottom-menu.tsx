@@ -44,6 +44,7 @@ const BottomMenu = () => {
   const [prompt, setPrompt] = useState("");
   const [aspectRatio, setAspectRatio] = useState("4:5");
   const [count, setCount] = useState(1);
+  const [model, setModel] = useState(MODELS[0]);
 
   // Close creative mode on click outside
   useEffect(() => {
@@ -74,15 +75,15 @@ const BottomMenu = () => {
           layout
           transition={{
             type: "spring",
-            bounce: 0.15,
-            duration: 0.5
+            bounce: 0.2,
+            duration: 0.6
           }}
           className={cn(
             "bg-background/80 backdrop-blur-2xl border border-border/50 shadow-2xl shadow-primary/5 overflow-hidden",
-            isCreativeMode ? "rounded-3xl w-[90vw] max-w-[600px]" : "rounded-[24px]"
+            isCreativeMode ? "rounded-[32px] w-[95vw] max-w-[800px]" : "rounded-[24px]"
           )}
         >
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="popLayout" initial={false}>
             {!isCreativeMode ? (
               // ----------------------------------------------------------------------
               // DEFAULT DOCK MODE
@@ -145,16 +146,16 @@ const BottomMenu = () => {
               // ----------------------------------------------------------------------
               <motion.div
                 key="studio"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.2 }}
-                className="flex flex-col p-4 gap-4 w-full"
+                initial={{ opacity: 0, scale: 0.98, filter: "blur(10px)" }}
+                animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                exit={{ opacity: 0, scale: 0.98, filter: "blur(10px)" }}
+                transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+                className="flex flex-col p-4 gap-6 w-full"
               >
                 {/* Top Row: Input */}
-                <div className="flex items-start gap-3">
-                  <div className="flex-1 relative">
-                    <Button variant="ghost" size="icon" className="absolute left-0 top-0 h-9 w-9 text-muted-foreground hover:text-foreground">
+                <div className="flex items-start gap-4">
+                  <div className="flex-1 relative pt-1">
+                    <Button variant="ghost" size="icon" className="absolute left-0 top-1 h-8 w-8 text-muted-foreground/70 hover:text-foreground rounded-full">
                       <PlusIcon size={18} />
                     </Button>
                     <textarea
@@ -162,7 +163,7 @@ const BottomMenu = () => {
                       value={prompt}
                       onChange={(e) => setPrompt(e.target.value)}
                       placeholder="Describe the scene you imagine..."
-                      className="w-full bg-transparent border-none resize-none outline-none text-lg min-h-[60px] pl-10 pt-1.5 placeholder:text-muted-foreground/40 font-medium"
+                      className="w-full bg-transparent border-none resize-none outline-none text-xl leading-relaxed min-h-[80px] pl-10 placeholder:text-muted-foreground/40 font-medium"
                       onKeyDown={(e) => {
                         if (e.key === 'Escape') setIsCreativeMode(false);
                       }}

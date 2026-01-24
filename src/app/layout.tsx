@@ -22,12 +22,16 @@ export const metadata: Metadata = {
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
 import BottomMenu from "@/components/bottom-menu"
+import { createClient } from "@/utils/supabase/server"
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -40,7 +44,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
-          <BottomMenu />
+          {user && <BottomMenu />}
           <Toaster />
         </ThemeProvider>
       </body>
