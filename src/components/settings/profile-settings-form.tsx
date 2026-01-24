@@ -115,7 +115,7 @@ export function ProfileSettingsForm({ profile }: { profile: Profile }) {
         <form onSubmit={handleSubmit} className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <Card className="border-none shadow-none bg-transparent py-0">
                 <CardHeader className="px-0 pt-0">
-                    <CardTitle className="text-3xl font-bold tracking-tight">Public Profile</CardTitle>
+                    <h1 className="text-3xl font-bold tracking-tight">Public Profile</h1>
                     <CardDescription className="text-lg">
                         This is how others will see you on ImagineOS.
                     </CardDescription>
@@ -176,7 +176,7 @@ export function ProfileSettingsForm({ profile }: { profile: Profile }) {
                                     </div>
                                 </button>
                                 <div className="pb-4 space-y-1">
-                                    <h3 className="font-bold text-xl">{formData.full_name || formData.username}</h3>
+                                    <h2 className="font-bold text-xl">{formData.full_name || formData.username}</h2>
                                     <p className="text-sm text-muted-foreground">Recommended: 400x400px</p>
                                 </div>
                                 <input

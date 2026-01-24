@@ -74,7 +74,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
 
                 {/* Header / Brand */}
                 <div className="flex h-20 items-center px-6">
-                    <Link href="/" className="flex items-center gap-2 group">
+                    <Link href="/" className="flex items-center gap-2 group p-2 -m-2" aria-label="ImagineOS Home">
                         <div className="size-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform">
                             <SparklesIcon className="size-5" />
                         </div>
@@ -99,6 +99,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
                                 <Link
                                     key={item.href}
                                     href={item.disabled ? "#" : item.href}
+                                    aria-current={isActive ? 'page' : undefined}
                                     className={cn(
                                         "group flex items-center gap-4 rounded-2xl px-3 py-3.5 transition-all duration-300 relative",
                                         isActive
