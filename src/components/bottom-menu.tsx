@@ -46,6 +46,27 @@ const BottomMenu = () => {
   const [count, setCount] = useState(1);
   const [model, setModel] = useState(MODELS[0]);
 
+  // Generation State (Mockup)
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  const startGeneration = () => {
+    setIsGenerating(true);
+    setProgress(0);
+
+    // Simulate generation progress
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          setTimeout(() => setIsGenerating(false), 1000); // Wait bit before hiding
+          return 100;
+        }
+        return prev + 2; // Progress speed
+      });
+    }, 50);
+  };
+
   // Close creative mode on click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -68,9 +89,52 @@ const BottomMenu = () => {
   return (
     <div
       ref={containerRef}
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] flex flex-col items-center w-full max-w-2xl px-4 pointer-events-none"
+      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] flex flex-col items-center w-full max-w-2xl px-4 pointer-events-none gap-3"
     >
-      <div className="pointer-events-auto">
+      {/* Generation Status Indicator */}
+      <AnimatePresence>
+        {isGenerating && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 5, scale: 0.95 }}
+            className="bg-background/80 backdrop-blur-xl border border-border/50 shadow-xl rounded-2xl p-3 flex items-center gap-4 pointer-events-auto min-w-[300px]"
+          >
+            {/* Thumbnail Previews (Mock) */}
+            <div className="flex -space-x-2">
+              {[...Array(4)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                  className="w-10 h-10 rounded-lg bg-gradient-to-br from-muted to-muted/50 border border-white/10 ring-2 ring-background overflow-hidden relative"
+                >
+                  <div className="absolute inset-0 bg-white/10 animate-pulse" />
+                </motion.div>
+              ))}
+            </div>
+
+            <div className="flex-1 space-y-1.5 min-w-0">
+              <div className="flex items-center justify-between text-xs font-medium">
+                <span className="text-foreground/90">Generating 4 images...</span>
+                <span className="text-muted-foreground">{progress}%</span>
+              </div>
+              {/* Progress Bar */}
+              <div className="h-1.5 w-full bg-muted/50 rounded-full overflow-hidden">
+                <motion.div
+                  className="h-full bg-primary rounded-full"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progress}%` }}
+                  transition={{ ease: "linear" }}
+                />
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="pointer-events-auto w-full flex justify-center">
         <motion.div
           layout
           transition={{
@@ -237,6 +301,7 @@ const BottomMenu = () => {
                   <Button
                     size="lg"
                     className="h-11 rounded-xl px-6 bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/25 font-semibold text-sm shrink-0"
+                    onClick={startGeneration}
                   >
                     Generate
                     <Wand2Icon className="ml-2 h-4 w-4" />
