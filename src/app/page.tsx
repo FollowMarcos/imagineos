@@ -3,8 +3,20 @@
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { GoogleIcon, XIcon } from "@/components/icons"
+import { createClient } from "@/utils/supabase/client"
 
 export default function LandingPage() {
+
+    const handleLogin = async (provider: 'google' | 'twitter') => {
+        const supabase = createClient()
+        await supabase.auth.signInWithOAuth({
+            provider,
+            options: {
+                redirectTo: `${location.origin}/auth/callback`,
+            },
+        })
+    }
+
     return (
         <div className="min-h-dvh w-full bg-background flex flex-col items-center justify-between p-4 relative font-sans text-foreground">
 
@@ -29,6 +41,7 @@ export default function LandingPage() {
                 {/* Auth Buttons */}
                 <div className="w-full space-y-4 flex flex-col items-center animate-in fade-in slide-in-from-bottom-2 duration-700 delay-300 fill-mode-backwards">
                     <Button
+                        onClick={() => handleLogin('google')}
                         className="w-full h-12 rounded-full bg-foreground text-background hover:bg-foreground/90 font-medium text-base transition hover:scale-[1.02] shadow-sm"
                     >
                         <GoogleIcon className="w-5 h-5 mr-2" />
@@ -36,6 +49,7 @@ export default function LandingPage() {
                     </Button>
                     <Button
                         variant="outline"
+                        onClick={() => handleLogin('twitter')}
                         className="w-full h-12 rounded-full border border-border bg-transparent text-foreground hover:bg-accent font-medium text-base transition hover:scale-[1.02]"
                     >
                         <XIcon className="w-4 h-4 mr-2" />
