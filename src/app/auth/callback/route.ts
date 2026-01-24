@@ -13,16 +13,23 @@ export async function GET(request: Request) {
         const supabase = await createClient()
         const { error } = await supabase.auth.exchangeCodeForSession(code)
         if (!error) {
-            const forwardedHost = request.headers.get('x-forwarded-host') // original origin before load balancer
-            const isLocalEnv = process.env.NODE_ENV === 'development'
-            if (isLocalEnv) {
-                // we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
-                return NextResponse.redirect(`${origin}${next}`)
-            } else if (forwardedHost) {
-                return NextResponse.redirect(`https://${forwardedHost}${next}`)
-            } else {
-                return NextResponse.redirect(`${origin}${next}`)
+            const { data: { user } } = await supabase.auth.getUser()
+            let redirectUrl = next
+
+            if (user) {
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('username')
+                    .eq('id', user.id)
+                    .single()
+
+                if (profile?.username) {
+                    redirectUrl = `/p/${profile.username}`
+                }
             }
+
+            // Harden: Use origin for redirection to prevent host spoofing
+            return NextResponse.redirect(`${origin}${redirectUrl}`)
         }
     }
 
