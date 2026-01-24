@@ -48,23 +48,42 @@ const BottomMenu = () => {
 
   // Generation State (Mockup)
   const [isGenerating, setIsGenerating] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [generatedItems, setGeneratedItems] = useState<{ id: number; status: 'pending' | 'generating' | 'success' | 'failed' }[]>([]);
 
   const startGeneration = () => {
     setIsGenerating(true);
-    setProgress(0);
+    // Initialize 4 items as pending
+    setGeneratedItems([
+      { id: 0, status: 'pending' },
+      { id: 1, status: 'pending' },
+      { id: 2, status: 'pending' },
+      { id: 3, status: 'pending' },
+    ]);
 
-    // Simulate generation progress
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setTimeout(() => setIsGenerating(false), 1000); // Wait bit before hiding
-          return 100;
+    // Simulate sequential generation
+    let currentIndex = 0;
+
+    const processItem = () => {
+      if (currentIndex >= 4) return;
+
+      // Set current to generating
+      setGeneratedItems(prev => prev.map((item, i) => i === currentIndex ? { ...item, status: 'generating' } : item));
+
+      // Wait random time then finish
+      setTimeout(() => {
+        // Randomly fail the 3rd item just to show off the state
+        const status = currentIndex === 2 ? 'failed' : 'success';
+
+        setGeneratedItems(prev => prev.map((item, i) => i === currentIndex ? { ...item, status } : item));
+
+        currentIndex++;
+        if (currentIndex < 4) {
+          processItem();
         }
-        return prev + 2; // Progress speed
-      });
-    }, 50);
+      }, 1500 + Math.random() * 1000); // 1.5s - 2.5s per image
+    }
+
+    processItem();
   };
 
   // Close creative mode on click outside
@@ -98,38 +117,67 @@ const BottomMenu = () => {
             initial={{ opacity: 0, y: 10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 5, scale: 0.95 }}
-            className="bg-background/80 backdrop-blur-xl border border-border/50 shadow-xl rounded-2xl p-3 flex items-center gap-4 pointer-events-auto min-w-[300px]"
+            className="bg-background/80 backdrop-blur-xl border border-border/50 shadow-xl rounded-full pl-2 pr-2 py-2 flex items-center gap-3 pointer-events-auto"
           >
             {/* Thumbnail Previews (Mock) */}
-            <div className="flex -space-x-2">
-              {[...Array(4)].map((_, i) => (
+            <div className="flex -space-x-4 pl-1">
+              {generatedItems.map((item, i) => (
                 <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
+                  key={item.id}
+                  initial={{ opacity: 0, x: -10, scale: 0.8 }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
                   transition={{ delay: i * 0.1 }}
-                  className="w-10 h-10 rounded-lg bg-gradient-to-br from-muted to-muted/50 border border-white/10 ring-2 ring-background overflow-hidden relative"
+                  className={cn(
+                    "w-12 h-12 rounded-full border-2 border-background overflow-hidden relative flex items-center justify-center transition-all",
+                    item.status === 'pending' && "bg-muted",
+                    item.status === 'generating' && "bg-muted ring-2 ring-primary ring-offset-2 ring-offset-background z-10",
+                    item.status === 'success' && "bg-green-100 dark:bg-green-900/20",
+                    item.status === 'failed' && "bg-red-100 dark:bg-red-900/20",
+                  )}
                 >
-                  <div className="absolute inset-0 bg-white/10 animate-pulse" />
+                  {item.status === 'pending' && <div className="w-full h-full bg-muted/50" />}
+
+                  {item.status === 'generating' && (
+                    <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent animate-shimmer" style={{ backgroundSize: '200% 100%' }} />
+                  )}
+
+                  {item.status === 'success' && (
+                    <motion.img
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      src={`https://picsum.photos/seed/${i + 123}/200`}
+                      className="w-full h-full object-cover"
+                      alt="Generated"
+                    />
+                  )}
+
+                  {item.status === 'failed' && (
+                    <div className="text-destructive font-bold text-xs">!</div>
+                  )}
                 </motion.div>
               ))}
             </div>
 
-            <div className="flex-1 space-y-1.5 min-w-0">
-              <div className="flex items-center justify-between text-xs font-medium">
-                <span className="text-foreground/90">Generating 4 images...</span>
-                <span className="text-muted-foreground">{progress}%</span>
-              </div>
-              {/* Progress Bar */}
-              <div className="h-1.5 w-full bg-muted/50 rounded-full overflow-hidden">
-                <motion.div
-                  className="h-full bg-primary rounded-full"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${progress}%` }}
-                  transition={{ ease: "linear" }}
-                />
-              </div>
+            <div className="flex flex-col justify-center px-1 min-w-[120px]">
+              <span className="text-xs font-semibold">
+                {generatedItems.some(i => i.status === 'generating') ? 'Generating...' : 'Finished'}
+              </span>
+              <span className="text-[10px] text-muted-foreground">
+                {generatedItems.filter(i => i.status === 'success').length} success, {generatedItems.filter(i => i.status === 'failed').length} failed
+              </span>
             </div>
+
+            <div className="w-px h-6 bg-border mx-1" />
+
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-full hover:bg-muted -ml-1"
+              onClick={() => setIsGenerating(false)}
+            >
+              <XIcon size={14} />
+            </Button>
+
           </motion.div>
         )}
       </AnimatePresence>
