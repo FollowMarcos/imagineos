@@ -149,7 +149,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
 
             {/* Main Content */}
             <main className="flex-1 relative overflow-auto pb-20">
-                <div className="mx-auto max-w-4xl px-6 py-12 lg:px-12 lg:py-16">
+                <div className="max-w-5xl px-8 py-12 lg:px-16 lg:py-16">
                     {children}
                 </div>
             </main>

@@ -29,8 +29,6 @@ export default async function ProfileSettingsPage() {
     }
 
     return (
-        <div className="max-w-2xl mx-auto">
-            <ProfileSettingsForm profile={profile} />
-        </div>
+        <ProfileSettingsForm profile={profile} />
     )
 }
