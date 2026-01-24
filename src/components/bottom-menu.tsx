@@ -48,7 +48,11 @@ const BottomMenu = () => {
 
   // Generation State (Mockup)
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedItems, setGeneratedItems] = useState<{ id: number; status: 'pending' | 'generating' | 'success' | 'failed' }[]>([]);
+  const [generatedItems, setGeneratedItems] = useState<{
+    id: number;
+    status: 'pending' | 'generating' | 'success' | 'failed';
+    referenceImage?: string;
+  }[]>([]);
 
   const startGeneration = () => {
     setIsGenerating(true);
@@ -128,31 +132,48 @@ const BottomMenu = () => {
                   animate={{ opacity: 1, x: 0, scale: 1 }}
                   transition={{ delay: i * 0.1 }}
                   className={cn(
-                    "w-12 h-12 rounded-full border-2 border-background overflow-hidden relative flex items-center justify-center transition-all",
-                    item.status === 'pending' && "bg-muted",
-                    item.status === 'generating' && "bg-muted ring-2 ring-primary ring-offset-2 ring-offset-background z-10",
-                    item.status === 'success' && "bg-green-100 dark:bg-green-900/20",
-                    item.status === 'failed' && "bg-red-100 dark:bg-red-900/20",
+                    "w-12 h-12 rounded-full border-2 border-background overflow-hidden relative flex items-center justify-center transition-all bg-muted",
+                    item.status === 'success' && "ring-2 ring-lime-500 ring-offset-2 ring-offset-background",
+                    item.status === 'failed' && "ring-2 ring-red-500 ring-offset-2 ring-offset-background",
+                    // Generating internal border handled below
                   )}
                 >
-                  {item.status === 'pending' && <div className="w-full h-full bg-muted/50" />}
+                  {/* Base Layer: Reference or Special Placeholder */}
+                  <div className={cn(
+                    "absolute inset-0 flex items-center justify-center transition-opacity duration-500",
+                    item.status === 'success' ? "opacity-0" : "opacity-100"
+                  )}>
+                    {item.referenceImage ? (
+                      <img src={item.referenceImage} className="w-full h-full object-cover opacity-80" alt="Reference" />
+                    ) : (
+                      <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-indigo-500/10 to-purple-500/10">
+                        <SparklesIcon size={14} className="text-primary/40" />
+                      </div>
+                    )}
+                  </div>
 
+                  {/* Overlay: Generation Shimmer & Spinning Border */}
                   {item.status === 'generating' && (
-                    <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent animate-shimmer" style={{ backgroundSize: '200% 100%' }} />
+                    <>
+                      <div className="absolute inset-0 bg-white/20 animate-pulse mix-blend-overlay" />
+                      <div className="absolute inset-0 rounded-full border-[2.5px] border-orange-500 border-t-transparent animate-spin z-30" style={{ animationDuration: '1s' }} />
+                    </>
                   )}
 
+                  {/* Success Layer: Generated Image */}
                   {item.status === 'success' && (
                     <motion.img
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       src={`https://picsum.photos/seed/${i + 123}/200`}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover relative z-20"
                       alt="Generated"
                     />
                   )}
 
+                  {/* Failed Layer */}
                   {item.status === 'failed' && (
-                    <div className="text-destructive font-bold text-xs">!</div>
+                    <div className="relative z-20 text-destructive font-bold text-xs bg-background/80 w-full h-full flex items-center justify-center">!</div>
                   )}
                 </motion.div>
               ))}
