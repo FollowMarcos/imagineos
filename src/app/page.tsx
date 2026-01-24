@@ -1,6 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import Link from "next/link"
 import { GoogleIcon, XIcon } from "@/components/icons"
 
 export default function LandingPage() {
@@ -49,8 +50,8 @@ export default function LandingPage() {
                     © 2026 ImagineOS Inc.
                 </div>
                 <div className="flex gap-4">
-                    <a href="#" className="hover:text-foreground transition-colors">Privacy Policy</a>
-                    <a href="#" className="hover:text-foreground transition-colors">Terms of Service</a>
+                    <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link>
+                    <Link href="/terms" className="hover:text-foreground transition-colors">Terms of Service</Link>
                 </div>
             </footer>
         </div>
