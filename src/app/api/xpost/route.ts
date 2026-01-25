@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
     }
 
     // 2. Final Whitelist Validation for the image domain
-    const allowedImageDomains = ["pbs.twimg.com", "abs.twimg.com", "video.twimg.com"];
+    const allowedImageDomains = ["pbs.twimg.com", "abs.twimg.com", "video.twimg.com", "fxtwitter.com", "vxtwitter.com"];
     if (!allowedImageDomains.some(domain => targetUrl.hostname.endsWith(domain))) {
         console.error("[X-Fetch] Domain restricted:", targetUrl.hostname);
         return NextResponse.json(
