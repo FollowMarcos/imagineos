@@ -236,68 +236,66 @@ export function ImageStitcher() {
 
     if (!mounted) return null
 
-    return (
-        <div className="w-full max-w-6xl mx-auto space-y-8 pb-32">
-            {/* Step 1: Add Content */}
-            <section className="bg-card/30 backdrop-blur-md border border-border/50 rounded-3xl p-8 shadow-xl ring-1 ring-white/10">
-                <div className="flex flex-col md:flex-row gap-8 items-start">
-                    <div className="w-full md:w-1/2 space-y-4">
-                        <div className="flex items-center gap-3 mb-2">
-                            <div className="size-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-sm">1</div>
-                            <h2 className="text-xl font-bold">Add Source Material</h2>
-                        </div>
-                        <DropZone onDrop={handleDrop} multiple className="h-48" />
-                    </div>
 
-                    <div className="w-full md:w-1/2 space-y-4">
-                        <div className="flex items-center gap-3 mb-2">
-                            <div className="size-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-sm">2</div>
-                            <h2 className="text-xl font-bold">Import from Socials</h2>
-                        </div>
-                        <div className="p-6 rounded-2xl bg-muted/40 border-2 border-dashed border-border/50 flex flex-col gap-4 h-48 justify-center">
-                            <div className="flex gap-2">
-                                <Input
-                                    placeholder="Paste X/Twitter Image URL..."
-                                    className="bg-background/80"
-                                    value={twitterUrl}
-                                    onChange={(e) => setTwitterUrl(e.target.value)}
-                                />
-                                <Button size="icon" onClick={importFromTwitter} disabled={isLoadingTwitter}>
-                                    {isLoadingTwitter ? <Loader2Icon className="size-4 animate-spin" /> : <TwitterIcon className="size-4 fill-current" />}
-                                </Button>
-                            </div>
-                            <p className="text-xs text-muted-foreground text-center">We'll proxy the high-res image directly into your browser.</p>
-                        </div>
+    return (
+        <div className="w-full max-w-6xl mx-auto space-y-6 pb-24">
+            {/* Step 1: Add Content - Compacted */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                <div className="md:col-span-8 bg-card/30 backdrop-blur-md border border-border/50 rounded-2xl p-4 shadow-xl ring-1 ring-white/10 group overflow-hidden relative">
+                    <DropZone
+                        onDrop={handleDrop}
+                        multiple
+                        className="h-32 border-none bg-transparent"
+                    />
+                    <div className="absolute top-4 left-4 flex items-center gap-2 pointer-events-none group-hover:opacity-100 opacity-60 transition-opacity">
+                        <div className="size-6 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-[10px]">1</div>
+                        <span className="text-xs font-bold uppercase tracking-wider">Upload Images</span>
                     </div>
                 </div>
-            </section>
+
+                <div className="md:col-span-4 bg-card/30 backdrop-blur-md border border-border/50 rounded-2xl p-6 shadow-xl ring-1 ring-white/10 flex flex-col justify-center gap-3">
+                    <div className="flex items-center gap-3">
+                        <div className="size-6 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-[10px]">2</div>
+                        <h2 className="text-xs font-bold uppercase tracking-wider">Social Import</h2>
+                    </div>
+                    <div className="flex gap-2">
+                        <Input
+                            placeholder="X.com URL..."
+                            className="bg-background/80 h-10 text-sm"
+                            value={twitterUrl}
+                            onChange={(e) => setTwitterUrl(e.target.value)}
+                        />
+                        <Button size="icon" className="h-10 w-10 shrink-0" onClick={importFromTwitter} disabled={isLoadingTwitter}>
+                            {isLoadingTwitter ? <Loader2Icon className="size-4 animate-spin" /> : <TwitterIcon className="size-4 fill-current" />}
+                        </Button>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground leading-tight">Paste any post URL to extract images.</p>
+                </div>
+            </div>
 
             {/* Step 2: Arrange & Configure */}
             <section className={cn(
                 "transition-all duration-500",
                 images.length > 0 ? "opacity-100 translate-y-0" : "opacity-30 pointer-events-none translate-y-4"
             )}>
-                <div className="sticky top-6 z-50 mb-8 mt-12 bg-background/80 backdrop-blur-2xl border border-border/50 px-6 py-4 rounded-3xl shadow-2xl flex flex-wrap items-center justify-between gap-6 ring-1 ring-white/10">
-                    <div className="flex items-center gap-6">
-                        <div className="flex items-center gap-3">
-                            <div className="size-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-sm">3</div>
-                            <h2 className="text-lg font-bold whitespace-nowrap">Choose Layout</h2>
-                        </div>
-                        <div className="flex bg-muted/50 p-1.5 rounded-2xl gap-1 border border-border/20">
+                <div className="sticky top-6 z-50 mb-6 bg-background/80 backdrop-blur-2xl border border-border/50 px-5 py-3 rounded-2xl shadow-2xl flex flex-wrap items-center justify-between gap-4 ring-1 ring-white/10">
+                    <div className="flex items-center gap-5">
+                        <h2 className="text-sm font-bold whitespace-nowrap hidden sm:block">Layout</h2>
+                        <div className="flex bg-muted/50 p-1 rounded-xl gap-1 border border-border/20">
                             {[
                                 { id: 'vertical', icon: RowsIcon, label: 'Vertical' },
-                                { id: 'horizontal', icon: ColumnsIcon, label: 'Side-by-Side' },
+                                { id: 'horizontal', icon: ColumnsIcon, label: 'Side' },
                                 { id: 'grid', icon: GridIcon, label: 'Grid' }
                             ].map((item) => (
                                 <button
                                     key={item.id}
                                     onClick={() => setLayout(item.id as LayoutMode)}
                                     className={cn(
-                                        "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all whitespace-nowrap",
-                                        layout === item.id ? "bg-primary text-primary-foreground shadow-lg" : "hover:bg-accent/50 text-muted-foreground"
+                                        "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap",
+                                        layout === item.id ? "bg-primary text-primary-foreground shadow-md" : "hover:bg-accent/30 text-muted-foreground"
                                     )}
                                 >
-                                    <item.icon size={16} />
+                                    <item.icon size={14} />
                                     {item.label}
                                 </button>
                             ))}
@@ -305,17 +303,17 @@ export function ImageStitcher() {
                     </div>
 
                     <Button
-                        size="lg"
-                        className="rounded-full px-8 font-bold shadow-xl shadow-primary/25 h-12"
+                        size="default"
+                        className="rounded-xl px-6 font-bold shadow-lg shadow-primary/20 h-10"
                         onClick={downloadStitched}
                         disabled={images.length === 0}
                     >
-                        <DownloadIcon className="mr-2 size-5" />
-                        Download Stitch ({images.length} Images)
+                        <DownloadIcon className="mr-2 size-4" />
+                        Download ({images.length})
                     </Button>
                 </div>
 
-                <div className="bg-card/20 border border-border/50 rounded-[40px] p-8 min-h-[400px]">
+                <div className="bg-card/10 border border-border/50 rounded-3xl p-6 min-h-[300px]">
                     <DndContext
                         sensors={sensors}
                         collisionDetection={closestCenter}
@@ -326,26 +324,26 @@ export function ImageStitcher() {
                             items={images.map(i => i.id)}
                             strategy={rectSortingStrategy}
                         >
-                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                                 {images.map((img) => (
                                     <SortableItem key={img.id} id={img.id} url={img.url} onRemove={handleRemove} />
                                 ))}
                                 {images.length > 0 && (
                                     <button
                                         onClick={() => document.getElementById('dropzone')?.click()}
-                                        className="aspect-square rounded-2xl border-2 border-dashed border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-all flex flex-col items-center justify-center gap-2 group"
+                                        className="aspect-square rounded-xl border-2 border-dashed border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-all flex flex-col items-center justify-center gap-2 group"
                                     >
-                                        <div className="size-10 rounded-full bg-muted flex items-center justify-center group-hover:scale-110 transition-transform">
-                                            <span className="text-2xl text-muted-foreground">+</span>
+                                        <div className="size-8 rounded-full bg-muted flex items-center justify-center group-hover:scale-110 transition-transform">
+                                            <span className="text-xl text-muted-foreground">+</span>
                                         </div>
-                                        <span className="text-xs font-bold text-muted-foreground">Add More</span>
+                                        <span className="text-[10px] font-bold text-muted-foreground">Add</span>
                                     </button>
                                 )}
                             </div>
                         </SortableContext>
                         <DragOverlay>
                             {activeId ? (
-                                <div className="size-32 rounded-2xl overflow-hidden opacity-90 shadow-2xl ring-4 ring-primary cursor-grabbing scale-105 transition-transform">
+                                <div className="size-28 rounded-xl overflow-hidden opacity-90 shadow-2xl ring-2 ring-primary cursor-grabbing scale-105 transition-transform">
                                     <img src={images.find(i => i.id === activeId)?.url} alt="" className="w-full h-full object-cover" />
                                 </div>
                             ) : null}
@@ -353,10 +351,9 @@ export function ImageStitcher() {
                     </DndContext>
 
                     {images.length === 0 && (
-                        <div className="h-48 flex flex-col items-center justify-center text-muted-foreground gap-1">
-                            <LayersIcon className="size-12 opacity-10 mb-2" />
-                            <p className="font-bold">Workspace Empty</p>
-                            <p className="text-sm opacity-50">Upload or import images above to begin.</p>
+                        <div className="h-32 flex flex-col items-center justify-center text-muted-foreground gap-1">
+                            <LayersIcon className="size-10 opacity-10 mb-2" />
+                            <p className="text-xs font-bold opacity-30 tracking-widest uppercase">Workspace Ready</p>
                         </div>
                     )}
                 </div>

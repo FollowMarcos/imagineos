@@ -34,7 +34,7 @@ export function TapNavigation() {
     const pathname = usePathname()
 
     return (
-        <div className="flex items-center justify-center p-1.5 rounded-[calc(var(--radius)*2)] bg-background/40 backdrop-blur-xl border border-border/50 relative w-fit mx-auto ring-1 ring-white/10 shadow-xl overflow-hidden">
+        <div className="flex items-center justify-center p-1.5 rounded-[calc(var(--radius)*2)] bg-background/40 backdrop-blur-xl border border-border/50 relative w-fit mx-auto ring-1 ring-white/10 overflow-hidden">
             {TOOLS.map((tool) => {
                 const Icon = tool.icon
                 const isActive = pathname === tool.href
@@ -54,7 +54,7 @@ export function TapNavigation() {
                         {isActive && (
                             <motion.div
                                 layoutId="tap-nav-active"
-                                className="absolute inset-0 bg-primary shadow-lg shadow-primary/25"
+                                className="absolute inset-0 bg-primary"
                                 style={{ borderRadius: "calc(var(--radius) * 1.5)" }}
                                 transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                             />

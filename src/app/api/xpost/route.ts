@@ -2,17 +2,21 @@
 import { NextRequest, NextResponse } from "next/server";
 
 // Whitelist of allowed domains for X/Twitter images
-const ALLOWED_DOMAINS = ["pbs.twimg.com", "abs.twimg.com"];
-const MAX_SIZE_BYTES = 20 * 1024 * 1024; // 20MB
-const TIMEOUT_MS = 10000; // 10 seconds
+const ALLOWED_DOMAINS = ["pbs.twimg.com", "abs.twimg.com", "fxtwitter.com", "vxtwitter.com", "x.com", "twitter.com"];
+const MAX_SIZE_BYTES = 25 * 1024 * 1024; // 25MB
+const TIMEOUT_MS = 15000; // 15 seconds
 
 export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
-    const urlParam = searchParams.get("url");
+    let urlParam = searchParams.get("url");
 
     if (!urlParam) {
         return NextResponse.json({ error: "Missing 'url' parameter" }, { status: 400 });
     }
+
+    // Basic cleanup
+    urlParam = urlParam.trim();
+    if (!urlParam.startsWith("http")) urlParam = `https://${urlParam}`;
 
     let targetUrl: URL;
     try {
@@ -21,10 +25,31 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: "Invalid URL" }, { status: 400 });
     }
 
-    // 1. Whitelist Validation
-    if (!ALLOWED_DOMAINS.includes(targetUrl.hostname)) {
+    // 1. Handle X/Twitter Status Links
+    if (targetUrl.hostname === "x.com" || targetUrl.hostname === "twitter.com") {
+        try {
+            // Attempt to use fxtwitter to get meta tags with image URls
+            const fxUrl = `https://fxtwitter.com${targetUrl.pathname}`;
+            const fxRes = await fetch(fxUrl);
+            const html = await fxRes.text();
+
+            // Extract the og:image from meta tags
+            const imgMatch = html.match(/<meta property="og:image" content="([^"]+)"/);
+            if (imgMatch && imgMatch[1]) {
+                targetUrl = new URL(imgMatch[1]);
+            } else {
+                return NextResponse.json({ error: "Could not find image in this post. Make sure it has an image." }, { status: 404 });
+            }
+        } catch (err) {
+            return NextResponse.json({ error: "Failed to scrape post data" }, { status: 500 });
+        }
+    }
+
+    // 2. Final Whitelist Validation for the image domain
+    const allowedImageDomains = ["pbs.twimg.com", "abs.twimg.com", "video.twimg.com"];
+    if (!allowedImageDomains.some(domain => targetUrl.hostname.endsWith(domain))) {
         return NextResponse.json(
-            { error: "Domain not allowed. Only official Twitter image domains are supported." },
+            { error: `Domain ${targetUrl.hostname} not allowed. Please provide a direct X/Twitter image link or post URL.` },
             { status: 403 }
         );
     }
@@ -46,25 +71,14 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        // 2. Size Cap Check (Content-Length header)
-        const contentLength = response.headers.get("content-length");
-        if (contentLength && parseInt(contentLength) > MAX_SIZE_BYTES) {
-            return NextResponse.json(
-                { error: "Image too large (exceeds 20MB limit)" },
-                { status: 413 }
-            );
-        }
-
-        // 3. Size Cap Check (Stream reading if header missing or unreliable)
         const buffer = await response.arrayBuffer();
         if (buffer.byteLength > MAX_SIZE_BYTES) {
             return NextResponse.json(
-                { error: "Image too large (exceeds 20MB limit)" },
+                { error: "Image too large" },
                 { status: 413 }
             );
         }
 
-        // Convert to Base64
         const base64String = Buffer.from(buffer).toString('base64');
         const contentType = response.headers.get("content-type") || "image/jpeg";
 
