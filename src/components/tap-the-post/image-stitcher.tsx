@@ -24,7 +24,7 @@ import { DropZone } from "./drop-zone"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
-import { XIcon, ColumnsIcon, RowsIcon, GridIcon, DownloadIcon, Loader2Icon, TrashIcon, TwitterIcon } from "lucide-react"
+import { XIcon, ColumnsIcon, RowsIcon, GridIcon, DownloadIcon, Loader2Icon, TrashIcon, TwitterIcon, LayersIcon } from "lucide-react"
 import { toast } from "sonner"
 
 type LayoutMode = "vertical" | "horizontal" | "grid"
@@ -78,13 +78,19 @@ function SortableItem({ id, url, onRemove }: { id: string, url: string, onRemove
     )
 }
 
+
 export function ImageStitcher() {
     const [images, setImages] = useState<StitchedImage[]>([])
     const [twitterUrl, setTwitterUrl] = useState("")
     const [isLoadingTwitter, setIsLoadingTwitter] = useState(false)
     const [layout, setLayout] = useState<LayoutMode>("vertical")
     const [activeId, setActiveId] = useState<string | null>(null)
+    const [mounted, setMounted] = useState(false)
     const canvasRef = useRef<HTMLCanvasElement>(null)
+
+    useEffect(() => {
+        setMounted(true)
+    }, [])
 
     const sensors = useSensors(
         useSensor(PointerSensor),
@@ -98,7 +104,6 @@ export function ImageStitcher() {
 
         for (const file of files) {
             const url = URL.createObjectURL(file)
-            // We need dimensions for the canvas stitching later
             await new Promise<void>((resolve) => {
                 const img = new Image()
                 img.onload = () => {
@@ -120,30 +125,11 @@ export function ImageStitcher() {
 
     const importFromTwitter = async () => {
         if (!twitterUrl) return
-
         setIsLoadingTwitter(true)
         try {
-            // Check if user entered a full URL or just status ID, handle basic cleanup
-            // Just pass standard URL to API
             const res = await fetch(`/api/xpost?url=${encodeURIComponent(twitterUrl)}`)
-            if (!res.ok) {
-                const err = await res.json()
-                throw new Error(err.error || "Failed to fetch")
-            }
-
+            if (!res.ok) throw new Error("Failed to fetch")
             const data = await res.json()
-            // API currently returns single image data url. 
-            // If we wanted multiple images from a thread, the API needs to be smarter and scrape, 
-            // but requirement implies importing "The post" -> usually implies scraping the images from it.
-            // Given the complexity of scraping X, let's assume the user pastes the IMAGE URL or we just support single image for now 
-            // UNLESS the prompt implies extracting *post images*.
-            // "fetch the post data, extracts high-resolution image URLs... and proxies them"
-            // My current API implementation simple proxies A URL. It doesn't scrape a POST.
-            // I should probably clarify this or update the API to scrape provided a tweet URL, 
-            // but scraping twitter without API key is hard/flaky.
-            // For now, let's assume the user pastes the IMAGE URL directly (right click image -> copy address).
-            // or I can update logic if I had a scraper. 
-            // Let's stick to "Image Proxy" behavior as implemented, assuming user provides Image Link.
 
             const img = new Image()
             img.onload = () => {
@@ -155,10 +141,9 @@ export function ImageStitcher() {
                 }])
                 setTwitterUrl("")
                 setIsLoadingTwitter(false)
-                toast.success("Image imported from X")
+                toast.success("Image imported")
             }
             img.src = data.data
-
         } catch (error: any) {
             toast.error(error.message)
             setIsLoadingTwitter(false)
@@ -169,13 +154,10 @@ export function ImageStitcher() {
         setImages(prev => prev.filter(img => img.id !== id))
     }
 
-    const handleDragStart = (event: any) => {
-        setActiveId(event.active.id)
-    }
+    const handleDragStart = (event: any) => setActiveId(event.active.id)
 
     const handleDragEnd = (event: any) => {
         const { active, over } = event
-
         if (active.id !== over?.id) {
             setImages((items) => {
                 const oldIndex = items.findIndex(i => i.id === active.id)
@@ -188,77 +170,10 @@ export function ImageStitcher() {
 
     const downloadStitched = () => {
         if (images.length === 0) return
-
         const canvas = document.createElement("canvas")
         const ctx = canvas.getContext("2d")
         if (!ctx) return
 
-        // Calculate total dimensions based on layout
-        let totalWidth = 0
-        let totalHeight = 0
-
-        // Simplified Logic: Normalize widths to the first image width for consistency?
-        // Or just stack them raw? "Stitcher" usually implies stacking.
-        // Let's find the max width for vertical stack, max height for horizontal.
-
-        if (layout === "vertical") {
-            const maxWidth = Math.max(...images.map(i => i.width))
-            totalWidth = maxWidth
-            // Scale heights proportionally to fit max width
-            totalHeight = images.reduce((acc, img) => {
-                const scale = maxWidth / img.width
-                return acc + (img.height * scale)
-            }, 0)
-        } else if (layout === "horizontal") {
-            const maxHeight = Math.max(...images.map(i => i.height))
-            totalHeight = maxHeight
-            // Scale widths
-            totalWidth = images.reduce((acc, img) => {
-                const scale = maxHeight / img.height
-                return acc + (img.width * scale)
-            }, 0)
-        } else {
-            // Grid (2 columns fixed for simplicity?)
-            // "Automatically calculates a balanced grid (e.g., 2x2)"
-            const cols = Math.ceil(Math.sqrt(images.length))
-            const rows = Math.ceil(images.length / cols)
-
-            // Very complex to do dynamic masonry measurement in canvas.
-            // Simplified approach: Make all square or fit in cells.
-            // Let's just find max dimensions and make a grid of that size.
-            const maxWidth = Math.max(...images.map(i => i.width))
-            const maxHeight = Math.max(...images.map(i => i.height))
-
-            totalWidth = maxWidth * cols
-            totalHeight = maxHeight * rows
-        }
-
-        canvas.width = totalWidth
-        canvas.height = totalHeight
-
-        // Draw
-        let currentX = 0
-        let currentY = 0
-
-        if (layout === "vertical") {
-            const maxWidth = totalWidth
-            images.forEach(img => {
-                const scale = maxWidth / img.width
-                const h = img.height * scale
-                ctx.drawImage(img.url as any, 0, 0, img.width, img.height, 0, currentY, maxWidth, h)
-                // Note: we can't use img object directly if it's not loaded... wait, we have URLs.
-                // We need to actually load these Images into helper elements to draw them synchronously?
-                // Wait, we can create Image objects. But drawImage requires an element.
-                // We need to preload them all or rely on the Fact that they are likely cached?
-                // Actually `images` state has URLs. We need to create Image elements again to draw.
-                // This function should probably be async.
-                currentY += h
-            })
-            // Since "drawImage" logic above is pseudo-code for the sync issue, let's fix it.
-            // Real implementation below.
-        }
-
-        // Correct Async Drawing Implementation
         const finalDraw = async () => {
             const loadedImages = await Promise.all(images.map(src => {
                 return new Promise<HTMLImageElement>((resolve) => {
@@ -269,116 +184,138 @@ export function ImageStitcher() {
                 })
             }))
 
-            // Re-calc dimensions with loaded images just in case
-            // ... logic same as above ...
+            let totalWidth = 0, totalHeight = 0
+            if (layout === "vertical") {
+                totalWidth = Math.max(...loadedImages.map(i => i.width))
+                totalHeight = loadedImages.reduce((acc, img) => acc + (img.height * (totalWidth / img.width)), 0)
+            } else if (layout === "horizontal") {
+                totalHeight = Math.max(...loadedImages.map(i => i.height))
+                totalWidth = loadedImages.reduce((acc, img) => acc + (img.width * (totalHeight / img.height)), 0)
+            } else {
+                const cols = Math.ceil(Math.sqrt(images.length))
+                const rows = Math.ceil(images.length / cols)
+                const maxWidth = Math.max(...loadedImages.map(i => i.width))
+                const maxHeight = Math.max(...loadedImages.map(i => i.height))
+                totalWidth = maxWidth * cols
+                totalHeight = maxHeight * rows
+            }
 
-            // Actually drawing
-            ctx.fillStyle = "#ffffff" // Background color? Or transparent?
-            // Maybe user wants transparent? Let's default to white for JPG.
+            canvas.width = totalWidth
+            canvas.height = totalHeight
+            ctx.fillStyle = "#ffffff"
             ctx.fillRect(0, 0, totalWidth, totalHeight)
 
             if (layout === "vertical") {
                 let y = 0
                 loadedImages.forEach(img => {
-                    const scale = totalWidth / img.width
-                    const h = img.height * scale
+                    const h = img.height * (totalWidth / img.width)
                     ctx.drawImage(img, 0, 0, img.width, img.height, 0, y, totalWidth, h)
                     y += h
                 })
             } else if (layout === "horizontal") {
                 let x = 0
                 loadedImages.forEach(img => {
-                    const scale = totalHeight / img.height
-                    const w = img.width * scale
+                    const w = img.width * (totalHeight / img.height)
                     ctx.drawImage(img, 0, 0, img.width, img.height, x, 0, w, totalHeight)
                     x += w
                 })
-            } else { // Grid
+            } else {
                 const cols = Math.ceil(Math.sqrt(loadedImages.length))
                 const cellW = totalWidth / cols
                 const cellH = totalHeight / Math.ceil(loadedImages.length / cols)
-
                 loadedImages.forEach((img, i) => {
-                    const col = i % cols
-                    const row = Math.floor(i / cols)
-                    // Center in cell? Stretch? Let's object-fit cover-like behavior or center. 
-                    // Simple stretch for now to fill grid.
-                    ctx.drawImage(img, 0, 0, img.width, img.height, col * cellW, row * cellH, cellW, cellH)
+                    ctx.drawImage(img, 0, 0, img.width, img.height, (i % cols) * cellW, Math.floor(i / cols) * cellH, cellW, cellH)
                 })
             }
 
-            // Save
-            const dataUrl = canvas.toDataURL("image/png") // PNG for quality
-            saveAs(dataUrl, `stitched-${layout}-${Date.now()}.png`)
+            saveAs(canvas.toDataURL("image/png"), `stitched-${layout}-${Date.now()}.png`)
             toast.success("Stitch saved!")
         }
-
         finalDraw()
     }
 
+    if (!mounted) return null
 
     return (
-        <div className="w-full max-w-4xl mx-auto space-y-8">
-            <div className="flex flex-col md:flex-row gap-8">
-                {/* Controls */}
-                <div className="w-full md:w-1/3 space-y-6">
-                    <div className="space-y-4 p-5 rounded-xl border bg-card/50">
-                        <h3 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Add Images</h3>
-                        <DropZone onDrop={handleDrop} multiple className="h-32 p-4" />
+        <div className="w-full max-w-6xl mx-auto space-y-8 pb-32">
+            {/* Step 1: Add Content */}
+            <section className="bg-card/30 backdrop-blur-md border border-border/50 rounded-3xl p-8 shadow-xl ring-1 ring-white/10">
+                <div className="flex flex-col md:flex-row gap-8 items-start">
+                    <div className="w-full md:w-1/2 space-y-4">
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="size-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-sm">1</div>
+                            <h2 className="text-xl font-bold">Add Source Material</h2>
+                        </div>
+                        <DropZone onDrop={handleDrop} multiple className="h-48" />
+                    </div>
 
-                        <div className="flex gap-2">
-                            <div className="relative flex-1">
-                                <TwitterIcon className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                    <div className="w-full md:w-1/2 space-y-4">
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="size-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-sm">2</div>
+                            <h2 className="text-xl font-bold">Import from Socials</h2>
+                        </div>
+                        <div className="p-6 rounded-2xl bg-muted/40 border-2 border-dashed border-border/50 flex flex-col gap-4 h-48 justify-center">
+                            <div className="flex gap-2">
                                 <Input
-                                    placeholder="Paste X Image URL..."
-                                    className="pl-9"
+                                    placeholder="Paste X/Twitter Image URL..."
+                                    className="bg-background/80"
                                     value={twitterUrl}
                                     onChange={(e) => setTwitterUrl(e.target.value)}
                                 />
+                                <Button size="icon" onClick={importFromTwitter} disabled={isLoadingTwitter}>
+                                    {isLoadingTwitter ? <Loader2Icon className="size-4 animate-spin" /> : <TwitterIcon className="size-4 fill-current" />}
+                                </Button>
                             </div>
-                            <Button size="icon" variant="secondary" onClick={importFromTwitter} disabled={isLoadingTwitter}>
-                                {isLoadingTwitter ? <Loader2Icon className="size-4 animate-spin" /> : <DownloadIcon className="size-4" />}
-                            </Button>
+                            <p className="text-xs text-muted-foreground text-center">We'll proxy the high-res image directly into your browser.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Step 2: Arrange & Configure */}
+            <section className={cn(
+                "transition-all duration-500",
+                images.length > 0 ? "opacity-100 translate-y-0" : "opacity-30 pointer-events-none translate-y-4"
+            )}>
+                <div className="sticky top-6 z-50 mb-8 mt-12 bg-background/80 backdrop-blur-2xl border border-border/50 px-6 py-4 rounded-3xl shadow-2xl flex flex-wrap items-center justify-between gap-6 ring-1 ring-white/10">
+                    <div className="flex items-center gap-6">
+                        <div className="flex items-center gap-3">
+                            <div className="size-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-sm">3</div>
+                            <h2 className="text-lg font-bold whitespace-nowrap">Choose Layout</h2>
+                        </div>
+                        <div className="flex bg-muted/50 p-1.5 rounded-2xl gap-1 border border-border/20">
+                            {[
+                                { id: 'vertical', icon: RowsIcon, label: 'Vertical' },
+                                { id: 'horizontal', icon: ColumnsIcon, label: 'Side-by-Side' },
+                                { id: 'grid', icon: GridIcon, label: 'Grid' }
+                            ].map((item) => (
+                                <button
+                                    key={item.id}
+                                    onClick={() => setLayout(item.id as LayoutMode)}
+                                    className={cn(
+                                        "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all whitespace-nowrap",
+                                        layout === item.id ? "bg-primary text-primary-foreground shadow-lg" : "hover:bg-accent/50 text-muted-foreground"
+                                    )}
+                                >
+                                    <item.icon size={16} />
+                                    {item.label}
+                                </button>
+                            ))}
                         </div>
                     </div>
 
-                    <div className="space-y-4 p-5 rounded-xl border bg-card/50">
-                        <h3 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Layout</h3>
-                        <div className="grid grid-cols-3 gap-2">
-                            <Button
-                                variant={layout === "vertical" ? "default" : "outline"}
-                                className="h-20 flex flex-col gap-2"
-                                onClick={() => setLayout("vertical")}
-                            >
-                                <RowsIcon className="size-6" />
-                                <span className="text-xs">Vertical</span>
-                            </Button>
-                            <Button
-                                variant={layout === "horizontal" ? "default" : "outline"}
-                                className="h-20 flex flex-col gap-2"
-                                onClick={() => setLayout("horizontal")}
-                            >
-                                <ColumnsIcon className="size-6" />
-                                <span className="text-xs">Side</span>
-                            </Button>
-                            <Button
-                                variant={layout === "grid" ? "default" : "outline"}
-                                className="h-20 flex flex-col gap-2"
-                                onClick={() => setLayout("grid")}
-                            >
-                                <GridIcon className="size-6" />
-                                <span className="text-xs">Grid</span>
-                            </Button>
-                        </div>
-                    </div>
-
-                    <Button className="w-full h-12 text-lg rounded-xl" onClick={downloadStitched} disabled={images.length === 0}>
-                        Download Stitch
+                    <Button
+                        size="lg"
+                        className="rounded-full px-8 font-bold shadow-xl shadow-primary/25 h-12"
+                        onClick={downloadStitched}
+                        disabled={images.length === 0}
+                    >
+                        <DownloadIcon className="mr-2 size-5" />
+                        Download Stitch ({images.length} Images)
                     </Button>
                 </div>
 
-                {/* Workspace */}
-                <div className="w-full md:w-2/3 min-h-[500px] rounded-xl border-2 border-dashed border-border/50 bg-muted/20 p-6">
+                <div className="bg-card/20 border border-border/50 rounded-[40px] p-8 min-h-[400px]">
                     <DndContext
                         sensors={sensors}
                         collisionDetection={closestCenter}
@@ -389,16 +326,26 @@ export function ImageStitcher() {
                             items={images.map(i => i.id)}
                             strategy={rectSortingStrategy}
                         >
-                            <div className="grid grid-cols-3 gap-4">
+                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
                                 {images.map((img) => (
                                     <SortableItem key={img.id} id={img.id} url={img.url} onRemove={handleRemove} />
                                 ))}
+                                {images.length > 0 && (
+                                    <button
+                                        onClick={() => document.getElementById('dropzone')?.click()}
+                                        className="aspect-square rounded-2xl border-2 border-dashed border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-all flex flex-col items-center justify-center gap-2 group"
+                                    >
+                                        <div className="size-10 rounded-full bg-muted flex items-center justify-center group-hover:scale-110 transition-transform">
+                                            <span className="text-2xl text-muted-foreground">+</span>
+                                        </div>
+                                        <span className="text-xs font-bold text-muted-foreground">Add More</span>
+                                    </button>
+                                )}
                             </div>
                         </SortableContext>
                         <DragOverlay>
                             {activeId ? (
-                                <div className="size-24 rounded-lg overflow-hidden opacity-80 shadow-xl cursor-grabbing">
-                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <div className="size-32 rounded-2xl overflow-hidden opacity-90 shadow-2xl ring-4 ring-primary cursor-grabbing scale-105 transition-transform">
                                     <img src={images.find(i => i.id === activeId)?.url} alt="" className="w-full h-full object-cover" />
                                 </div>
                             ) : null}
@@ -406,12 +353,14 @@ export function ImageStitcher() {
                     </DndContext>
 
                     {images.length === 0 && (
-                        <div className="h-full flex items-center justify-center text-muted-foreground text-sm">
-                            Add images to start stitching
+                        <div className="h-48 flex flex-col items-center justify-center text-muted-foreground gap-1">
+                            <LayersIcon className="size-12 opacity-10 mb-2" />
+                            <p className="font-bold">Workspace Empty</p>
+                            <p className="text-sm opacity-50">Upload or import images above to begin.</p>
                         </div>
                     )}
                 </div>
-            </div>
+            </section>
         </div>
     )
 }

@@ -35,9 +35,7 @@ export function ImageSlicer() {
     }, [])
 
     const processSlices = (img: HTMLImageElement) => {
-        // 1 image -> 4 vertical slices (horizontal carousel)
-        // Wait, requirement is "split any uploaded image into 4 equal horizontal segments"
-        // Usually carousels are horizontal, so we split the WIDTH.
+        // Splitting into 4 equal horizontal segments (segmenting height)
 
         const canvas = document.createElement("canvas")
         const ctx = canvas.getContext("2d")
@@ -47,20 +45,20 @@ export function ImageSlicer() {
             return
         }
 
-        const segmentWidth = img.width / SLICE_COUNT
-        const height = img.height
+        const segmentHeight = img.height / SLICE_COUNT
+        const width = img.width
 
         const newSlices: string[] = []
 
         for (let i = 0; i < SLICE_COUNT; i++) {
-            canvas.width = segmentWidth
-            canvas.height = height
+            canvas.width = width
+            canvas.height = segmentHeight
 
             ctx.clearRect(0, 0, canvas.width, canvas.height)
             ctx.drawImage(
                 img,
-                i * segmentWidth, 0, segmentWidth, height, // Source
-                0, 0, segmentWidth, height // Dest
+                0, i * segmentHeight, width, segmentHeight, // Source
+                0, 0, width, segmentHeight // Dest
             )
 
             newSlices.push(canvas.toDataURL("image/jpeg", 0.95))
@@ -83,7 +81,7 @@ export function ImageSlicer() {
             })
 
             const content = await zip.generateAsync({ type: "blob" })
-            saveAs(content, "carousel-slices.zip")
+            saveAs(content, "horizontal-slices.zip")
             toast.success("Download started!")
         } catch (err) {
             console.error(err)
@@ -99,7 +97,7 @@ export function ImageSlicer() {
     }
 
     return (
-        <div className="w-full max-w-4xl mx-auto space-y-8">
+        <div className="w-full max-w-2xl mx-auto space-y-8">
             {!sourceImage ? (
                 <motion.div
                     layout
@@ -108,7 +106,7 @@ export function ImageSlicer() {
                 >
                     <DropZone onDrop={handleDrop} className="h-64" />
                     <p className="mt-4 text-center text-sm text-muted-foreground w-full">
-                        Upload an image to split it into {SLICE_COUNT} seamless carousel slides.
+                        Upload an image to split it into {SLICE_COUNT} horizontal segments.
                     </p>
                 </motion.div>
             ) : (
@@ -118,15 +116,15 @@ export function ImageSlicer() {
                     animate={{ opacity: 1 }}
                     className="space-y-8"
                 >
-                    {/* Preview Grid */}
-                    <div className="grid grid-cols-4 gap-2 md:gap-4 overflow-hidden rounded-xl border bg-background/50 p-2 md:p-4 shadow-sm">
+                    {/* Preview Grid - Stacked Vertically */}
+                    <div className="flex flex-col gap-1 overflow-hidden rounded-xl border bg-background/50 p-2 md:p-4 shadow-sm">
                         {slices.map((slice, i) => (
-                            <div key={i} className="relative aspect-[4/5] bg-muted rounded-md overflow-hidden shadow-inner">
+                            <div key={i} className="relative bg-muted rounded-md overflow-hidden shadow-inner w-full">
                                 <span className="absolute top-2 left-2 z-10 size-6 flex items-center justify-center rounded-full bg-black/50 text-white text-xs font-bold backdrop-blur-md">
                                     {i + 1}
                                 </span>
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img src={slice} alt={`Slice ${i + 1}`} className="w-full h-full object-cover" />
+                                <img src={slice} alt={`Slice ${i + 1}`} className="w-full h-auto block" />
                             </div>
                         ))}
                     </div>
