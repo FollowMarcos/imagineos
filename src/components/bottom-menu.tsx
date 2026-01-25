@@ -1,8 +1,6 @@
 "use client";
 
 import {
-  SearchIcon,
-  BellIcon,
   UserIcon,
   HomeIcon,
   SparklesIcon,
@@ -14,7 +12,9 @@ import {
   PlusIcon,
   Settings2Icon,
   ChevronRightIcon,
-  HistoryIcon
+  HistoryIcon,
+  LibraryIcon,
+  FlaskConicalIcon,
 } from "lucide-react";
 import React, { useMemo, useState, useRef, useEffect } from "react";
 import { AnimatePresence, motion } from "motion/react";
@@ -26,10 +26,10 @@ import { Button } from "@/components/ui/button";
 
 const MAIN_NAV = [
   { icon: HomeIcon, name: "home", href: "/" },
-  { icon: SearchIcon, name: "search", href: "/search" },
-  { icon: BellIcon, name: "notifications", href: "/notifications" },
-  { icon: UserIcon, name: "profile", href: "/settings/profile" },
+  { icon: LibraryIcon, name: "library", href: "/library" },
   { icon: SparklesIcon, name: "create", href: null }, // The trigger
+  { icon: FlaskConicalIcon, name: "lab", href: "/lab" },
+  { icon: UserIcon, name: "profile", href: "/settings/profile" },
 ];
 
 const ASPECT_RATIOS = ["1:1", "4:5", "16:9", "9:16"];
