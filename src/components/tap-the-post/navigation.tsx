@@ -4,7 +4,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { ScissorsIcon, LayersIcon } from "lucide-react"
+import { ScissorsIcon, LayersIcon, PointerIcon } from "lucide-react"
 import {
     Tooltip,
     TooltipContent,
@@ -38,10 +38,10 @@ export function TapNavigation() {
 
                 {/* Header */}
                 <div className="flex flex-col items-center gap-1">
-                    <span className="text-[10px] font-bold tracking-[0.2em] text-muted-foreground vertical-text opacity-50 select-none pb-1" style={{ writingMode: "vertical-rl", textOrientation: "mixed" }}>
-                        TAP
-                    </span>
-                    <div className="w-4 h-px bg-border/50 my-2" />
+                    <div className="p-2 text-muted-foreground opacity-50 select-none">
+                        <PointerIcon className="size-4" />
+                    </div>
+                    <div className="w-4 h-px bg-border/50 my-1" />
                 </div>
 
                 {/* Tools List */}

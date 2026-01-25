@@ -4,7 +4,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { SettingsIcon, ScissorsIcon, LayersIcon } from "lucide-react"
+import { SettingsIcon, ScissorsIcon, LayersIcon, WrenchIcon } from "lucide-react"
 import {
     Tooltip,
     TooltipContent,
@@ -32,10 +32,10 @@ export default function LeftDock() {
 
                 {/* Header */}
                 <div className="flex flex-col items-center gap-1">
-                    <span className="text-[10px] font-bold tracking-widest text-muted-foreground vertical-text opacity-50 select-none" style={{ writingMode: "vertical-rl", textOrientation: "mixed" }}>
-                        TOOLS
-                    </span>
-                    <div className="w-4 h-px bg-border/50 my-2" />
+                    <div className="p-2 text-muted-foreground opacity-50 select-none">
+                        <WrenchIcon className="size-4" />
+                    </div>
+                    <div className="w-4 h-px bg-border/50 my-1" />
                 </div>
 
                 {/* Tools List */}
