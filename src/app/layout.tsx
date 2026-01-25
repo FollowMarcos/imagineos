@@ -49,6 +49,7 @@ export default async function RootLayout({
           <CustomThemeProvider>
             <CreativeProvider>
               {children}
+              {/* Global Docks & Navigation (Restricted to Authenticated Users) */}
               {user && (
                 <>
                   <LeftDock />
