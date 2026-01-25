@@ -43,16 +43,16 @@ export function StatsCards({
         }}
       >
         <div>
-          <h2 className="text-[#FF4400] text-5xl font-semibold tracking-tighter">
+          <h2 className="text-[#FF4400] text-5xl font-semibold tracking-tighter tabular-nums text-balance">
             $100k+
           </h2>
         </div>
         <div>
-          <h4 className="text-[#FF4400] font-medium text-lg leading-tight tracking-tighter">
+          <h4 className="text-[#FF4400] font-medium text-lg leading-tight tracking-tighter text-balance">
             Revenue driven
           </h4>
           <div className="w-full h-px bg-[#FF4400] my-2"></div>
-          <p className="text-[#FF4400] text-sm leading-tight tracking-tight max-w-[90%]">
+          <p className="text-[#FF4400] text-sm leading-tight tracking-tight max-w-[90%] text-pretty">
             From scroll-stopping campaigns that actually sell.
           </p>
         </div>
@@ -74,7 +74,7 @@ export function StatsCards({
         }}
       >
         <Image src={images[0]} alt="Model" fill className="object-cover" />
-        <div className="absolute top-5 left-5 bg-white/90 py-[4px] px-[8px] rounded-full text-xs font-semibold tracking-tighter text-black ">
+        <div className="absolute top-5 left-5 bg-white/90 py-[4px] px-[8px] rounded-full text-xs font-semibold tracking-tighter text-black tabular-nums">
           900k Liked
         </div>
       </motion.div>
@@ -94,16 +94,16 @@ export function StatsCards({
         }}
       >
         <div>
-          <h2 className="text-white text-5xl font-semibold tracking-tighter">
+          <h2 className="text-white text-5xl font-semibold tracking-tighter tabular-nums text-balance">
             37M+
           </h2>
         </div>
         <div>
-          <h4 className="text-white font-medium text-lg leading-tight tracking-tighter">
+          <h4 className="text-white font-medium text-lg leading-tight tracking-tighter text-balance">
             Organic impressions
           </h4>
           <div className="w-full h-px bg-white my-2"></div>
-          <p className="text-white text-sm leading-tight tracking-tight max-w-[90%]">
+          <p className="text-white text-sm leading-tight tracking-tight max-w-[90%] text-pretty">
             Growth through content that sells, not just trends.
           </p>
         </div>
@@ -124,7 +124,7 @@ export function StatsCards({
         }}
       >
         <Image src={images[1]} alt="Campaign" fill className="object-cover" />
-        <div className="absolute bottom-5 right-5 bg-white/90 py-[4px] px-[8px] rounded-full text-xs font-semibold tracking-tighter text-black ">
+        <div className="absolute bottom-5 right-5 bg-white/90 py-[4px] px-[8px] rounded-full text-xs font-semibold tracking-tighter text-black tabular-nums">
           1.5M Viewed
         </div>
       </motion.div>

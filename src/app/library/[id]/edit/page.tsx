@@ -75,7 +75,7 @@ export default function EditPromptPage() {
     return (
         <div className="max-w-4xl mx-auto p-6 md:py-10">
             <div className="mb-8">
-                <h1 className="text-3xl font-bold">Edit Prompt</h1>
+                <h1 className="text-3xl font-bold text-balance">Edit Prompt</h1>
             </div>
             {initialData && <PromptForm initialData={initialData} onSubmit={handleSubmit} isLoading={isLoading} />}
         </div>

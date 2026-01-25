@@ -88,7 +88,7 @@ export function PromptCard({ prompt, isShared, onShare, onDelete, onClone, onUse
             {/* Content Layer (Bottom) */}
             <div className="absolute bottom-0 left-0 right-0 p-6 z-30 flex flex-col gap-3">
                 <Link href={`/library/${prompt.id}`} className="group/title">
-                    <h3 className="text-white font-bold text-xl leading-tight tracking-tight line-clamp-2 group-hover/title:text-primary transition-colors">
+                    <h3 className="text-white font-bold text-xl leading-tight tracking-tight line-clamp-2 group-hover/title:text-primary transition-colors text-balance">
                         {prompt.title}
                     </h3>
                 </Link>
@@ -101,12 +101,21 @@ export function PromptCard({ prompt, isShared, onShare, onDelete, onClone, onUse
                     </span>
                 </div>
 
-                {/* Tags (Visible on Hover) - Using a more stable reveal */}
-                <div className="max-h-0 group-hover:max-h-20 overflow-hidden opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out flex flex-wrap gap-1.5">
-                    {prompt.tags.slice(0, 3).map(tag => (
-                        <span key={tag} className="text-xs text-white/90 bg-white/20 px-2.5 py-1 rounded-md font-medium backdrop-blur-sm">
+                {/* Tags (Visible on Hover) - Properly using compositor props */}
+                <div className="flex flex-wrap gap-1.5 h-6">
+                    {prompt.tags.slice(0, 3).map((tag, idx) => (
+                        <motion.span
+                            key={tag}
+                            initial={false}
+                            animate={{
+                                opacity: 1,
+                                y: 0,
+                                transition: { delay: 0.05 * idx }
+                            }}
+                            className="text-xs text-white/90 bg-white/20 px-2.5 py-1 rounded-md font-medium backdrop-blur-sm opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300"
+                        >
                             #{tag}
-                        </span>
+                        </motion.span>
                     ))}
                 </div>
 

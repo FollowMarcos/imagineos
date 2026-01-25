@@ -132,11 +132,12 @@ export function PromptForm({ initialData, onSubmit, isLoading }: PromptFormProps
                     <Label htmlFor="title">Title</Label>
                     <Input
                         id="title"
-                        placeholder="e.g. Cyberpunk City Street"
+                        placeholder="e.g. Cyberpunk City Street…"
                         value={formData.title}
                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                         onKeyDown={handleKeyDown}
                         required
+                        autoComplete="off"
                     />
                 </div>
 
@@ -162,17 +163,26 @@ export function PromptForm({ initialData, onSubmit, isLoading }: PromptFormProps
                         <Label>Tags</Label>
                         <div className="relative">
                             <Input
-                                placeholder="Type and press Enter..."
+                                placeholder="Type and press Enter…"
                                 value={tagInput}
                                 onChange={(e) => setTagInput(e.target.value)}
                                 onKeyDown={addTag}
+                                autoComplete="off"
                             />
                         </div>
                         <div className="flex flex-wrap gap-2 mt-1">
                             {formData.tags.map(tag => (
                                 <Badge key={tag} variant="secondary" className="px-2 py-1 gap-1">
                                     {tag}
-                                    <XIcon size={12} className="cursor-pointer hover:text-destructive" onClick={() => removeTag(tag)} />
+                                    <XIcon
+                                        size={12}
+                                        className="cursor-pointer hover:text-destructive transition-colors"
+                                        onClick={() => removeTag(tag)}
+                                        aria-label={`Remove tag ${tag}`}
+                                        role="button"
+                                        tabIndex={0}
+                                        onKeyDown={(e) => e.key === 'Enter' && removeTag(tag)}
+                                    />
                                 </Badge>
                             ))}
                         </div>
@@ -186,10 +196,11 @@ export function PromptForm({ initialData, onSubmit, isLoading }: PromptFormProps
                     <Label htmlFor="positive" className="text-primary font-semibold">Positive Prompt</Label>
                     <Textarea
                         id="positive"
-                        placeholder="What do you want to see?"
+                        placeholder="What do you want to see?…"
                         className="min-h-[120px] font-mono text-sm bg-muted/30"
                         value={formData.positive_prompt}
                         onChange={(e) => setFormData({ ...formData, positive_prompt: e.target.value })}
+                        autoComplete="off"
                     />
                 </div>
 
@@ -197,10 +208,11 @@ export function PromptForm({ initialData, onSubmit, isLoading }: PromptFormProps
                     <Label htmlFor="negative" className="text-muted-foreground">Negative Prompt</Label>
                     <Textarea
                         id="negative"
-                        placeholder="What do you want to avoid? (e.g. blurry, low quality)"
+                        placeholder="What do you want to avoid? (e.g. blurry, low quality)…"
                         className="min-h-[80px] font-mono text-sm bg-muted/30"
                         value={formData.negative_prompt}
                         onChange={(e) => setFormData({ ...formData, negative_prompt: e.target.value })}
+                        autoComplete="off"
                     />
                 </div>
             </div>
@@ -216,17 +228,20 @@ export function PromptForm({ initialData, onSubmit, isLoading }: PromptFormProps
                                 type="button"
                                 onClick={() => removeImage(i)}
                                 className="absolute top-1 right-1 bg-black/50 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                aria-label="Remove image"
                             >
-                                <XIcon size={14} />
+                                <XIcon size={14} aria-hidden="true" />
                             </button>
                         </div>
                     ))}
 
-                    <div
-                        className="aspect-square rounded-xl border-2 border-dashed border-muted-foreground/20 flex flex-col items-center justify-center cursor-pointer hover:bg-muted/50 hover:border-primary/50 transition-all text-muted-foreground hover:text-primary"
+                    <button
+                        type="button"
+                        className="aspect-square rounded-xl border-2 border-dashed border-muted-foreground/20 flex flex-col items-center justify-center cursor-pointer hover:bg-muted/50 hover:border-primary/50 transition-[background-color,border-color] text-muted-foreground hover:text-primary"
                         onClick={() => fileInputRef.current?.click()}
+                        aria-label="Upload reference image"
                     >
-                        <UploadCloudIcon className="w-8 h-8 mb-2" />
+                        <UploadCloudIcon className="size-8 mb-2" aria-hidden="true" />
                         <span className="text-xs font-medium">Upload</span>
                         <input
                             ref={fileInputRef}
@@ -235,7 +250,7 @@ export function PromptForm({ initialData, onSubmit, isLoading }: PromptFormProps
                             className="hidden"
                             onChange={handleImageUpload}
                         />
-                    </div>
+                    </button>
                 </div>
             </div>
 
@@ -279,7 +294,7 @@ export function PromptForm({ initialData, onSubmit, isLoading }: PromptFormProps
                     Cancel
                 </Button>
                 <Button type="submit" disabled={isLoading}>
-                    {isLoading ? "Saving..." : "Save Prompt"}
+                    {isLoading ? "Saving…" : "Save Prompt"}
                 </Button>
             </div>
 

@@ -153,8 +153,8 @@ export default function LibraryPage() {
             {/* Header */}
             <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur-md px-6 py-4 flex flex-col md:flex-row items-center gap-4">
                 <div className="flex-1">
-                    <h1 className="text-2xl font-bold tracking-tight">Prompt Library</h1>
-                    <p className="text-muted-foreground text-sm font-medium opacity-80">Manage and organize your creative DNA.</p>
+                    <h1 className="text-2xl font-bold tracking-tight text-balance">Prompt Library</h1>
+                    <p className="text-muted-foreground text-sm font-medium opacity-80 text-pretty">Manage and organize your creative DNA.</p>
                 </div>
 
                 <div className="flex items-center gap-2 w-full md:w-auto">
@@ -217,7 +217,7 @@ export default function LibraryPage() {
                     </div>
                 ) : (
                     <div className="flex flex-col items-center justify-center py-20 text-muted-foreground gap-4">
-                        <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
+                        <div className="size-16 rounded-full bg-muted flex items-center justify-center">
                             {activeTab === 'my-prompts' ? <Sparkles /> : <InboxIcon />}
                         </div>
                         <p>No prompts found. {activeTab === 'my-prompts' ? 'Create your first one!' : 'Nobody has shared anything with you yet.'}</p>

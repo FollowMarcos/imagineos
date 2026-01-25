@@ -165,7 +165,7 @@ export default function SinglePromptPage() {
                 <div className="space-y-8">
                     <div>
                         <div className="flex items-start justify-between gap-4">
-                            <h1 className="text-3xl font-bold leading-tight">{prompt.title}</h1>
+                            <h1 className="text-3xl font-bold leading-tight text-balance">{prompt.title}</h1>
                             {/* Actions */}
                             <div className="flex gap-2 shrink-0">
                                 {isOwner ? (

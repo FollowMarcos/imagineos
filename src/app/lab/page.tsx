@@ -130,12 +130,12 @@ export default function LabHandFixerPage() {
                 {/* Header */}
                 <header className="flex items-center justify-between">
                     <div className="flex flex-col">
-                        <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-                            <Sparkles className="w-5 h-5 text-primary" aria-hidden="true" />
+                        <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2 text-balance">
+                            <Sparkles className="size-5 text-primary" aria-hidden="true" />
                             Hand Fixer
                             <span className="text-[10px] font-mono bg-primary/10 text-primary px-2 py-0.5 rounded uppercase tracking-wider font-bold border border-primary/20">LAB</span>
                         </h1>
-                        <p className="text-muted-foreground text-sm text-balance max-w-md">
+                        <p className="text-muted-foreground text-sm text-balance max-w-md text-pretty">
                             Upload an image to detect hands and apply perfect poses with AI precision.
                         </p>
                     </div>
@@ -169,7 +169,7 @@ export default function LabHandFixerPage() {
                             onDrop={handleImageUpload}
                         >
                             <div className="bg-background rounded-full p-6 shadow-xl shadow-primary/5 mb-6 group transition-transform hover:scale-105">
-                                <UploadCloud className="w-10 h-10 text-primary group-hover:text-primary/80 transition-colors" />
+                                <UploadCloud className="size-10 text-primary group-hover:text-primary/80 transition-colors" />
                             </div>
                             <h2 className="text-xl font-semibold mb-2">Drag & drop your image</h2>
                             <p className="text-muted-foreground mb-6">or click to browse from your computer</p>
