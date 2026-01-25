@@ -43,28 +43,35 @@ export default function LeftDock() {
                     {TOOLS.map((tool) => {
                         const Icon = tool.icon
                         const isActive = pathname.startsWith(tool.href)
+                        const isScissors = tool.icon === ScissorsIcon
+
+                        const content = (
+                            <Link
+                                href={tool.href}
+                                className={cn(
+                                    "p-3 rounded-full transition-all duration-300 relative group hover:scale-110",
+                                    isActive
+                                        ? "text-primary-foreground"
+                                        : "text-muted-foreground hover:bg-primary/10 hover:text-primary"
+                                )}
+                            >
+                                <Icon className="size-5 relative z-10" />
+                                {isActive && (
+                                    <motion.div
+                                        layoutId="left-dock-active"
+                                        className="absolute inset-0 bg-primary rounded-full shadow-lg shadow-primary/25"
+                                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                    />
+                                )}
+                            </Link>
+                        )
+
+                        if (isScissors) return <div key={tool.href}>{content}</div>
 
                         return (
                             <Tooltip key={tool.href}>
                                 <TooltipTrigger asChild>
-                                    <Link
-                                        href={tool.href}
-                                        className={cn(
-                                            "p-3 rounded-full transition-all duration-300 relative group hover:scale-110",
-                                            isActive
-                                                ? "text-primary-foreground"
-                                                : "text-muted-foreground hover:bg-primary/10 hover:text-primary"
-                                        )}
-                                    >
-                                        <Icon className="size-5 relative z-10" />
-                                        {isActive && (
-                                            <motion.div
-                                                layoutId="left-dock-active"
-                                                className="absolute inset-0 bg-primary rounded-full shadow-lg shadow-primary/25"
-                                                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                                            />
-                                        )}
-                                    </Link>
+                                    {content}
                                 </TooltipTrigger>
                                 <TooltipContent side="right" className="ml-2 font-medium bg-background/80 backdrop-blur-lg border-border/50 px-3 py-1.5 rounded-xl">
                                     <div className="space-y-0.5">
@@ -85,31 +92,24 @@ export default function LeftDock() {
                 {/* Settings */}
                 <div className="flex flex-col items-center gap-3">
                     <div className="w-4 h-px bg-border/50" />
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Link
-                                href="/settings/profile"
-                                className={cn(
-                                    "p-3 rounded-full transition-all duration-300 relative group hover:scale-110",
-                                    pathname.startsWith("/settings")
-                                        ? "text-primary-foreground"
-                                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                                )}
-                            >
-                                <SettingsIcon className="size-5 relative z-10" />
-                                {pathname.startsWith("/settings") && (
-                                    <motion.div
-                                        layoutId="left-dock-active"
-                                        className="absolute inset-0 bg-primary rounded-full shadow-lg shadow-primary/25"
-                                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                                    />
-                                )}
-                            </Link>
-                        </TooltipTrigger>
-                        <TooltipContent side="right" className="ml-2 font-medium bg-background/80 backdrop-blur-lg border-border/50 px-3 py-1.5 rounded-xl">
-                            Settings
-                        </TooltipContent>
-                    </Tooltip>
+                    <Link
+                        href="/settings/profile"
+                        className={cn(
+                            "p-3 rounded-full transition-all duration-300 relative group hover:scale-110",
+                            pathname.startsWith("/settings")
+                                ? "text-primary-foreground"
+                                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                        )}
+                    >
+                        <SettingsIcon className="size-5 relative z-10" />
+                        {pathname.startsWith("/settings") && (
+                            <motion.div
+                                layoutId="left-dock-active"
+                                className="absolute inset-0 bg-primary rounded-full shadow-lg shadow-primary/25"
+                                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                            />
+                        )}
+                    </Link>
                 </div>
             </aside>
         </TooltipProvider>

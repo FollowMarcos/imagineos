@@ -26,10 +26,7 @@ export default async function TapThePostLayout({
 
     return (
         <div className="min-h-dvh bg-background w-full">
-            <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-                <div className="absolute top-[-20%] right-[-10%] size-[60%] bg-primary/5 blur-[120px] rounded-full" />
-                <div className="absolute bottom-[-10%] left-[-10%] size-[50%] bg-primary/10 blur-[100px] rounded-full" />
-            </div>
+            <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true" />
 
             <main className="relative z-10 container mx-auto px-4 py-12 md:py-24 space-y-8 flex flex-col items-center">
                 <div className="space-y-2 text-center max-w-lg mx-auto">

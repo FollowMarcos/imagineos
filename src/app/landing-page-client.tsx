@@ -46,10 +46,7 @@ export default function LandingPageClient() {
     return (
         <div className="min-h-dvh w-full bg-background flex flex-col items-center justify-between p-4 relative font-sans text-foreground overflow-hidden">
             {/* Background Decorative Element */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-                <div className="absolute top-[-10%] left-[-10%] size-[40%] bg-primary/10 blur-[120px] rounded-full" />
-                <div className="absolute bottom-[-10%] right-[-10%] size-[40%] bg-primary/5 blur-[120px] rounded-full" />
-            </div>
+            <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true" />
 
             <motion.main
                 variants={containerVariants}

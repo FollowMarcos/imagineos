@@ -49,28 +49,35 @@ export function TapNavigation() {
                     {TOOLS.map((tool) => {
                         const Icon = tool.icon
                         const isActive = pathname === tool.href
+                        const isScissors = tool.icon === ScissorsIcon
+
+                        const content = (
+                            <Link
+                                href={tool.href}
+                                className={cn(
+                                    "p-3 rounded-full transition-all duration-300 relative group hover:scale-110",
+                                    isActive
+                                        ? "text-primary-foreground"
+                                        : "text-muted-foreground hover:bg-primary/10 hover:text-primary"
+                                )}
+                            >
+                                <Icon className="size-5 relative z-10" />
+                                {isActive && (
+                                    <motion.div
+                                        layoutId="tap-dock-active"
+                                        className="absolute inset-0 bg-primary rounded-full shadow-lg shadow-primary/25"
+                                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                    />
+                                )}
+                            </Link>
+                        )
+
+                        if (isScissors) return <div key={tool.href}>{content}</div>
 
                         return (
                             <Tooltip key={tool.href}>
                                 <TooltipTrigger asChild>
-                                    <Link
-                                        href={tool.href}
-                                        className={cn(
-                                            "p-3 rounded-full transition-all duration-300 relative group hover:scale-110",
-                                            isActive
-                                                ? "text-primary-foreground"
-                                                : "text-muted-foreground hover:bg-primary/10 hover:text-primary"
-                                        )}
-                                    >
-                                        <Icon className="size-5 relative z-10" />
-                                        {isActive && (
-                                            <motion.div
-                                                layoutId="tap-dock-active"
-                                                className="absolute inset-0 bg-primary rounded-full shadow-lg shadow-primary/25"
-                                                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                                            />
-                                        )}
-                                    </Link>
+                                    {content}
                                 </TooltipTrigger>
                                 <TooltipContent side="left" className="mr-2 font-medium bg-background/80 backdrop-blur-lg border-border/50 px-3 py-1.5 rounded-xl">
                                     <div className="space-y-0.5 text-right">

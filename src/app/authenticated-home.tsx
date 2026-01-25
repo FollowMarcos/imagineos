@@ -19,10 +19,7 @@ export default function AuthenticatedHome({ user, username, fullName }: { user: 
     return (
         <div className="min-h-dvh w-full bg-background flex flex-col items-center relative font-sans text-foreground overflow-hidden">
             {/* Ambient Background */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-                <div className="absolute top-[-20%] right-[-10%] size-[60%] bg-primary/5 blur-[120px] rounded-full" />
-                <div className="absolute bottom-[-10%] left-[-10%] size-[50%] bg-primary/10 blur-[100px] rounded-full" />
-            </div>
+            <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true" />
 
             {/* Simple Nav */}
             <nav className="w-full max-w-7xl mx-auto px-6 py-4 flex justify-between items-center z-20">
