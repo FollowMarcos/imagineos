@@ -28,7 +28,7 @@ export default function LeftDock() {
 
     return (
         <TooltipProvider delayDuration={0}>
-            <aside className="fixed left-6 top-1/2 -translate-y-1/2 z-40 hidden lg:flex flex-col items-center gap-6 py-6 px-3 bg-background/60 backdrop-blur-xl border border-border/50 rounded-full shadow-2xl shadow-primary/5 ring-1 ring-white/10">
+            <aside className="fixed left-6 top-1/2 -translate-y-1/2 z-40 hidden lg:flex flex-col items-center gap-6 py-6 px-3 bg-background/60 backdrop-blur-xl border border-border/50 rounded-[calc(var(--radius)*4)] shadow-2xl shadow-primary/5 ring-1 ring-white/10">
 
                 {/* Header */}
                 <div className="flex flex-col items-center gap-1">
@@ -45,11 +45,11 @@ export default function LeftDock() {
                         const isActive = pathname.startsWith(tool.href)
                         const isScissors = tool.icon === ScissorsIcon
 
-                        const content = (
+                        const link = (
                             <Link
                                 href={tool.href}
                                 className={cn(
-                                    "p-3 rounded-full transition-all duration-300 relative group hover:scale-110",
+                                    "p-3 rounded-2xl transition-all duration-300 relative group hover:scale-110",
                                     isActive
                                         ? "text-primary-foreground"
                                         : "text-muted-foreground hover:bg-primary/10 hover:text-primary"
@@ -59,19 +59,19 @@ export default function LeftDock() {
                                 {isActive && (
                                     <motion.div
                                         layoutId="left-dock-active"
-                                        className="absolute inset-0 bg-primary rounded-full shadow-lg shadow-primary/25"
+                                        className="absolute inset-0 bg-primary rounded-2xl shadow-lg shadow-primary/25"
                                         transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                                     />
                                 )}
                             </Link>
                         )
 
-                        if (isScissors) return <div key={tool.href}>{content}</div>
+                        if (isScissors) return <div key={tool.href}>{link}</div>
 
                         return (
                             <Tooltip key={tool.href}>
                                 <TooltipTrigger asChild>
-                                    {content}
+                                    {link}
                                 </TooltipTrigger>
                                 <TooltipContent side="right" className="ml-2 font-medium bg-background/80 backdrop-blur-lg border-border/50 px-3 py-1.5 rounded-xl">
                                     <div className="space-y-0.5">
@@ -95,7 +95,7 @@ export default function LeftDock() {
                     <Link
                         href="/settings/profile"
                         className={cn(
-                            "p-3 rounded-full transition-all duration-300 relative group hover:scale-110",
+                            "p-3 rounded-2xl transition-all duration-300 relative group hover:scale-110",
                             pathname.startsWith("/settings")
                                 ? "text-primary-foreground"
                                 : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
@@ -105,7 +105,7 @@ export default function LeftDock() {
                         {pathname.startsWith("/settings") && (
                             <motion.div
                                 layoutId="left-dock-active"
-                                className="absolute inset-0 bg-primary rounded-full shadow-lg shadow-primary/25"
+                                className="absolute inset-0 bg-primary rounded-2xl shadow-lg shadow-primary/25"
                                 transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                             />
                         )}

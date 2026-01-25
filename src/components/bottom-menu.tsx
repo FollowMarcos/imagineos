@@ -211,7 +211,7 @@ const BottomMenu = () => {
           }}
           className={cn(
             "bg-background/80 backdrop-blur-2xl border border-border/50 shadow-2xl shadow-primary/5 overflow-hidden",
-            isCreativeMode ? "rounded-[32px] w-[95vw] max-w-[800px]" : "rounded-[24px]"
+            isCreativeMode ? "rounded-[calc(var(--radius)*4+8px)] w-[95vw] max-w-[800px]" : "rounded-[calc(var(--radius)*4)]"
           )}
         >
           <AnimatePresence mode="popLayout" initial={false}>
