@@ -7,6 +7,7 @@ interface CustomTheme {
     background?: string;
     foreground?: string;
     radius?: string;
+    fontFamily?: string;
 }
 
 interface CustomThemeContextType {
@@ -38,16 +39,44 @@ export function CustomThemeProvider({ children }: { children: React.ReactNode })
 
     const applyTheme = (theme: CustomTheme) => {
         const root = document.documentElement;
-        if (theme.primary) root.style.setProperty("--primary", theme.primary);
-        if (theme.primary) root.style.setProperty("--ring", theme.primary);
-        if (theme.primary) root.style.setProperty("--sidebar-primary", theme.primary);
+        if (theme.primary) {
+            root.style.setProperty("--primary", theme.primary);
+            root.style.setProperty("--ring", theme.primary);
+            root.style.setProperty("--sidebar-primary", theme.primary);
+        }
 
-        if (theme.background) root.style.setProperty("--background", theme.background);
-        if (theme.background) root.style.setProperty("--card", theme.background);
-        if (theme.background) root.style.setProperty("--popover", theme.background);
-        if (theme.background) root.style.setProperty("--sidebar", theme.background);
+        if (theme.background) {
+            root.style.setProperty("--background", theme.background);
+            root.style.setProperty("--card", theme.background);
+            root.style.setProperty("--popover", theme.background);
+            root.style.setProperty("--sidebar", theme.background);
+        }
+
+        if (theme.foreground) {
+            root.style.setProperty("--foreground", theme.foreground);
+            root.style.setProperty("--card-foreground", theme.foreground);
+            root.style.setProperty("--popover-foreground", theme.foreground);
+            root.style.setProperty("--sidebar-foreground", theme.foreground);
+        }
 
         if (theme.radius) root.style.setProperty("--radius", `${theme.radius}rem`);
+
+        if (theme.fontFamily) {
+            root.style.setProperty("--font-figtree", theme.fontFamily + ", sans-serif");
+            loadFont(theme.fontFamily);
+        }
+    };
+
+    const loadFont = (fontName: string) => {
+        if (fontName === "Figtree" || !fontName) return;
+        const fontId = `font-${fontName.toLowerCase().replace(/\s+/g, "-")}`;
+        if (document.getElementById(fontId)) return;
+
+        const link = document.createElement("link");
+        link.id = fontId;
+        link.rel = "stylesheet";
+        link.href = `https://fonts.googleapis.com/css2?family=${fontName.replace(/\s+/g, "+")}:wght@400;500;600;700&display=swap`;
+        document.head.appendChild(link);
     };
 
     const setThemeConfig = (newConfig: CustomTheme) => {
@@ -62,14 +91,12 @@ export function CustomThemeProvider({ children }: { children: React.ReactNode })
         localStorage.removeItem(STORAGE_KEY);
         // Clear inline styles
         const root = document.documentElement;
-        root.style.removeProperty("--primary");
-        root.style.removeProperty("--ring");
-        root.style.removeProperty("--sidebar-primary");
-        root.style.removeProperty("--background");
-        root.style.removeProperty("--card");
-        root.style.removeProperty("--popover");
-        root.style.removeProperty("--sidebar");
-        root.style.removeProperty("--radius");
+        [
+            "--primary", "--ring", "--sidebar-primary",
+            "--background", "--card", "--popover", "--sidebar",
+            "--foreground", "--card-foreground", "--popover-foreground", "--sidebar-foreground",
+            "--radius", "--font-figtree"
+        ].forEach(prop => root.style.removeProperty(prop));
     };
 
     return (
