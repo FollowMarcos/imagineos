@@ -46,21 +46,21 @@ export default function LeftDock() {
         <TooltipProvider delayDuration={0}>
             <aside
                 className={cn(
-                    "fixed top-1/2 -translate-y-1/2 z-40 hidden lg:flex flex-col items-center gap-6 py-6 px-3 bg-background/60 backdrop-blur-xl border border-border/50 rounded-[calc(var(--radius)*4)] shadow-2xl shadow-primary/5 ring-1 ring-white/10 transition-all duration-300",
+                    "fixed top-1/2 -translate-y-1/2 z-40 hidden lg:flex flex-col items-center gap-1.5 p-2 bg-background/80 backdrop-blur-2xl border border-border/50 rounded-[calc(var(--radius)*4)] shadow-2xl shadow-primary/5 ring-1 ring-white/10 transition-all duration-300",
                     dockPosition === 'left' ? "left-6" : "right-6"
                 )}
             >
 
-                {/* Header */}
-                <div className="flex flex-col items-center gap-1">
-                    <div className="p-2 text-muted-foreground opacity-50 select-none">
-                        <WrenchIcon className="size-4" />
+                {/* Header/Indicator */}
+                <div className="flex flex-col items-center gap-1.5">
+                    <div className="p-3 text-muted-foreground opacity-30 select-none">
+                        <WrenchIcon className="size-5" strokeWidth={2.5} />
                     </div>
-                    <div className="w-4 h-px bg-border/50 my-1" />
+                    <div className="w-6 h-px bg-border/50 mb-1.5" />
                 </div>
 
                 {/* Tools List */}
-                <nav className="flex flex-col gap-3">
+                <nav className="flex flex-col gap-1.5">
                     {TOOLS.map((tool) => {
                         const Icon = tool.icon
                         const isActive = pathname.startsWith(tool.href)
@@ -70,7 +70,7 @@ export default function LeftDock() {
                             <Link
                                 href={tool.href}
                                 className={cn(
-                                    "p-3 flex items-center justify-center transition-all duration-300 relative group hover:scale-110",
+                                    "p-3 flex items-center justify-center transition-all duration-300 relative group hover:scale-105",
                                     isActive
                                         ? "text-primary-foreground"
                                         : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
@@ -116,13 +116,13 @@ export default function LeftDock() {
                 </nav>
 
                 {/* Settings & Toggle */}
-                <div className="flex flex-col items-center gap-3">
-                    <div className="w-4 h-px bg-border/50" />
+                <div className="flex flex-col items-center gap-1.5">
+                    <div className="w-6 h-px bg-border/50 my-1.5" />
 
                     <Link
                         href="/settings/profile"
                         className={cn(
-                            "p-3 flex items-center justify-center transition-all duration-300 relative group hover:scale-110",
+                            "p-3 flex items-center justify-center transition-all duration-300 relative group hover:scale-105",
                             pathname.startsWith("/settings")
                                 ? "text-primary-foreground"
                                 : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
@@ -142,7 +142,7 @@ export default function LeftDock() {
 
                     <button
                         onClick={togglePosition}
-                        className="p-3 flex items-center justify-center transition-all duration-300 relative group hover:scale-110 text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                        className="p-3 flex items-center justify-center transition-all duration-300 relative group hover:scale-105 text-muted-foreground hover:text-foreground hover:bg-muted/50"
                         style={{ borderRadius: "calc(var(--radius) * 1.5)" }}
                     >
                         <ArrowLeftRightIcon className="size-5" />
