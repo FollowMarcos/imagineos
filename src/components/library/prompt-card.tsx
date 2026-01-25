@@ -42,23 +42,22 @@ export function PromptCard({ prompt, isShared, onShare, onDelete, onClone, onUse
     return (
         <motion.div
             className={cn(
-                "relative z-20 w-full aspect-[4/5] rounded-[24px] overflow-hidden group hover:z-50 bg-background border border-border/40 shadow-sm hover:shadow-xl transition-all duration-500"
+                "relative z-20 w-full aspect-[4/5] rounded-[32px] overflow-hidden group hover:z-50 bg-background border border-border/40 shadow-sm hover:shadow-2xl transition-all duration-500"
             )}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             whileHover={{
-                y: -5,
-                scale: 1.02,
-                transition: { duration: 0.3, ease: "easeOut" },
+                y: -8,
+                transition: { duration: 0.4, ease: [0.23, 1, 0.32, 1] },
             }}
         >
             {/* Image Layer */}
-            <Link href={`/library/${prompt.id}`} className="block w-full h-full cursor-pointer relative">
+            <Link href={`/library/${prompt.id}`} className="block w-full h-full cursor-pointer relative font-sans">
                 {coverImage ? (
                     <img
                         src={coverImage}
                         alt={prompt.title}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105 will-change-transform"
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center bg-muted/30 text-muted-foreground/40">
@@ -66,12 +65,12 @@ export function PromptCard({ prompt, isShared, onShare, onDelete, onClone, onUse
                     </div>
                 )}
                 {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent opacity-70 group-hover:opacity-90 transition-opacity duration-500" />
             </Link>
 
             {/* Top Badge (Content Type) */}
             <div className="absolute top-4 left-4 z-30">
-                <div className="bg-white/90 dark:bg-black/80 backdrop-blur-md py-1.5 px-3 rounded-full text-[10px] font-bold tracking-wider text-foreground uppercase shadow-sm">
+                <div className="bg-white/95 dark:bg-black/90 py-1.5 px-3 rounded-full text-[10px] font-bold tracking-wider text-foreground uppercase shadow-sm border border-white/10 dark:border-white/5">
                     {prompt.content_type}
                 </div>
             </div>
@@ -79,7 +78,7 @@ export function PromptCard({ prompt, isShared, onShare, onDelete, onClone, onUse
             {/* Top Right (Shared Badge) */}
             {isShared && prompt.shared_by && (
                 <div className="absolute top-4 right-4 z-30">
-                    <div className="bg-indigo-500 text-white py-1.5 px-3 rounded-full text-[10px] font-bold tracking-wider uppercase shadow-sm flex items-center gap-1">
+                    <div className="bg-primary text-white py-1.5 px-3 rounded-full text-[10px] font-bold tracking-wider uppercase shadow-lg flex items-center gap-1">
                         <UserIcon size={10} />
                         @{prompt.shared_by.username}
                     </div>
@@ -87,17 +86,17 @@ export function PromptCard({ prompt, isShared, onShare, onDelete, onClone, onUse
             )}
 
             {/* Content Layer (Bottom) */}
-            <div className="absolute bottom-0 left-0 right-0 p-5 z-30 flex flex-col gap-3">
+            <div className="absolute bottom-0 left-0 right-0 p-6 z-30 flex flex-col gap-3">
                 <Link href={`/library/${prompt.id}`} className="group/title">
-                    <h3 className="text-white font-semibold text-xl leading-tight tracking-tight line-clamp-2 group-hover/title:text-primary transition-colors">
+                    <h3 className="text-white font-bold text-xl leading-tight tracking-tight line-clamp-2 group-hover/title:text-primary transition-colors">
                         {prompt.title}
                     </h3>
                 </Link>
 
                 {/* Subtitle / Model Info */}
                 <div className="flex items-center gap-2">
-                    <div className="h-px bg-white/40 flex-1" />
-                    <span className="text-white/80 text-[10px] uppercase tracking-widest font-medium">
+                    <div className="h-px bg-white/20 flex-1" />
+                    <span className="text-white/60 text-[10px] uppercase tracking-widest font-bold">
                         {prompt.models?.[0] || "Unknown"}
                     </span>
                 </div>
@@ -105,7 +104,7 @@ export function PromptCard({ prompt, isShared, onShare, onDelete, onClone, onUse
                 {/* Tags (Visible on Hover) */}
                 <div className="h-0 group-hover:h-auto overflow-hidden opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-wrap gap-1.5">
                     {prompt.tags.slice(0, 3).map(tag => (
-                        <span key={tag} className="text-[10px] text-white/90 bg-white/10 px-2 py-0.5 rounded-sm backdrop-blur-sm">
+                        <span key={tag} className="text-[10px] text-white/90 bg-white/20 px-2.5 py-1 rounded-md font-medium">
                             #{tag}
                         </span>
                     ))}
@@ -119,7 +118,7 @@ export function PromptCard({ prompt, isShared, onShare, onDelete, onClone, onUse
                             variant="secondary"
                             size="icon"
                             className={cn(
-                                "h-9 w-full rounded-xl bg-white/10 hover:bg-white text-white hover:text-black border-none backdrop-blur-md transition-all shadow-lg",
+                                "h-10 w-full rounded-2xl bg-white/15 hover:bg-white text-white hover:text-black border-none transition-all shadow-xl",
                                 action.variant === 'destructive' && "hover:bg-red-500 hover:text-white",
                                 action.variant === 'primary' && "bg-white text-black hover:bg-primary hover:text-white"
                             )}
