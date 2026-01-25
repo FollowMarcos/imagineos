@@ -118,7 +118,13 @@ export default function SinglePromptPage() {
     return (
         <div className="max-w-5xl mx-auto p-6 md:py-10 space-y-8">
             {/* Back */}
-            <Button variant="ghost" size="sm" onClick={() => router.back()} className="-ml-4 text-muted-foreground hover:text-foreground">
+            <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => router.back()}
+                className="-ml-2 text-muted-foreground hover:text-foreground"
+                aria-label="Go back to library"
+            >
                 <ChevronLeftIcon className="w-4 h-4 mr-1" /> Back to Library
             </Button>
 
@@ -138,9 +144,18 @@ export default function SinglePromptPage() {
                     {prompt.images?.length > 1 && (
                         <div className="flex gap-2 overflow-x-auto pb-2">
                             {prompt.images.map((img, i) => (
-                                <div key={i} className="w-20 h-20 shrink-0 rounded-lg overflow-hidden border bg-muted cursor-pointer hover:opacity-80">
-                                    <img src={img} className="w-full h-full object-cover" />
-                                </div>
+                                <button
+                                    key={i}
+                                    className="w-20 h-20 shrink-0 rounded-lg overflow-hidden border bg-muted cursor-pointer hover:opacity-80 transition-opacity focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+                                    onClick={() => {/* Suggestion: Add logic to switch main image if desired */ }}
+                                    aria-label={`View image thumbnail ${i + 1}`}
+                                >
+                                    <img
+                                        src={img}
+                                        alt={`Thumbnail ${i + 1} of ${prompt.title}`}
+                                        className="w-full h-full object-cover"
+                                    />
+                                </button>
                             ))}
                         </div>
                     )}
@@ -158,11 +173,11 @@ export default function SinglePromptPage() {
                                         <Button className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg" onClick={handleUsePrompt}>
                                             <SparklesIcon className="w-4 h-4 mr-2" /> Use
                                         </Button>
-                                        <Button variant="outline" size="icon" onClick={() => setIsShareOpen(true)}>
+                                        <Button variant="outline" size="icon" onClick={() => setIsShareOpen(true)} aria-label="Share prompt">
                                             <Share2Icon className="w-4 h-4" />
                                         </Button>
                                         <Link href={`/library/${prompt.id}/edit`}>
-                                            <Button variant="outline" size="icon">
+                                            <Button variant="outline" size="icon" aria-label="Edit prompt">
                                                 <EditIcon className="w-4 h-4" />
                                             </Button>
                                         </Link>
@@ -194,8 +209,9 @@ export default function SinglePromptPage() {
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8"
+                                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity h-8 w-8"
                                 onClick={() => handleCopyText(prompt.positive_prompt, "Positive Prompt")}
+                                aria-label="Copy positive prompt"
                             >
                                 <CopyIcon className="w-4 h-4" />
                             </Button>
@@ -207,8 +223,9 @@ export default function SinglePromptPage() {
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 text-muted-foreground"
+                                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity h-8 w-8 text-muted-foreground"
                                 onClick={() => handleCopyText(prompt.negative_prompt, "Negative Prompt")}
+                                aria-label="Copy negative prompt"
                             >
                                 <CopyIcon className="w-4 h-4" />
                             </Button>
@@ -219,7 +236,7 @@ export default function SinglePromptPage() {
                         <h3 className="text-sm font-medium">Tags</h3>
                         <div className="flex flex-wrap gap-2">
                             {prompt.tags?.map(tag => (
-                                <span key={tag} className="text-xs bg-muted px-2 py-1 rounded-md text-muted-foreground">#{tag}</span>
+                                <span key={tag} className="text-xs bg-muted px-2.5 py-1 rounded-md text-foreground/80 font-medium">#{tag}</span>
                             ))}
                         </div>
                     </div>

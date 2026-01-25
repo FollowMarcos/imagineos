@@ -151,20 +151,21 @@ export default function LibraryPage() {
     return (
         <div className="flex flex-col min-h-dvh bg-background">
             {/* Header */}
-            <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur-md px-6 py-4 flex flex-col md:flex-row items-center gap-4">
+            <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur-md px-6 py-4 flex flex-col md:flex-row items-center gap-4">
                 <div className="flex-1">
                     <h1 className="text-2xl font-bold tracking-tight">Prompt Library</h1>
-                    <p className="text-muted-foreground text-sm">Manage and organize your creative DNA.</p>
+                    <p className="text-muted-foreground text-sm font-medium opacity-80">Manage and organize your creative DNA.</p>
                 </div>
 
                 <div className="flex items-center gap-2 w-full md:w-auto">
                     <div className="relative flex-1 md:w-64">
-                        <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" aria-hidden="true" />
                         <Input
                             placeholder="Search prompts..."
-                            className="pl-9 bg-muted/50 border-none"
+                            className="pl-9 bg-muted/50 border-none blur-none focus-visible:ring-1 focus-visible:ring-primary/20"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
+                            aria-label="Search prompt library"
                         />
                     </div>
                     <NextLink href="/library/create">

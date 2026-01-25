@@ -131,17 +131,23 @@ export default function LabHandFixerPage() {
                 <header className="flex items-center justify-between">
                     <div className="flex flex-col">
                         <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-                            <Sparkles className="w-5 h-5 text-primary" />
+                            <Sparkles className="w-5 h-5 text-primary" aria-hidden="true" />
                             Hand Fixer
-                            <span className="text-xs font-mono bg-muted px-2 py-0.5 rounded text-muted-foreground">LAB</span>
+                            <span className="text-[10px] font-mono bg-primary/10 text-primary px-2 py-0.5 rounded uppercase tracking-wider font-bold border border-primary/20">LAB</span>
                         </h1>
-                        <p className="text-muted-foreground text-sm text-balance">
-                            Upload an image, detect hands, and apply perfect poses endlessly.
+                        <p className="text-muted-foreground text-sm text-balance max-w-md">
+                            Upload an image to detect hands and apply perfect poses with AI precision.
                         </p>
                     </div>
 
                     {image && (
-                        <Button variant="ghost" size="sm" onClick={clearImage} className="text-muted-foreground hover:text-destructive transition-colors">
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={clearImage}
+                            className="text-muted-foreground hover:text-destructive transition-colors"
+                            aria-label="Reset lab and clear image"
+                        >
                             <XCircle className="w-4 h-4 mr-2" />
                             Reset
                         </Button>
@@ -168,15 +174,17 @@ export default function LabHandFixerPage() {
                             <h2 className="text-xl font-semibold mb-2">Drag & drop your image</h2>
                             <p className="text-muted-foreground mb-6">or click to browse from your computer</p>
 
-                            <div className="relative">
-                                <Button size="lg" className="rounded-full px-8 relative z-10">
+                            <div className="relative group/upload">
+                                <Button size="lg" className="rounded-full px-8 relative z-10 pointer-events-none group-hover/upload:bg-primary/90">
                                     Select Image
                                 </Button>
                                 <input
+                                    id="hand-fixer-upload"
                                     type="file"
                                     accept="image/*"
                                     className="absolute inset-0 opacity-0 cursor-pointer z-20"
                                     onChange={handleImageUpload}
+                                    aria-label="Upload source image for hand fixing"
                                 />
                             </div>
                         </div>
@@ -186,13 +194,12 @@ export default function LabHandFixerPage() {
 
                             <div className="relative max-w-full max-h-full shadow-2xl rounded-lg overflow-hidden group">
                                 {/* The Image */}
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
                                     src={image}
-                                    alt="Uploaded"
+                                    alt="Source image for hand fixing"
                                     className={cn(
-                                        "max-w-full max-h-[70vh] object-contain transition-all duration-700",
-                                        isProcessing ? "blur-sm scale-[0.98] opacity-80" : "blur-0 scale-100 opacity-100"
+                                        "max-w-full max-h-[70vh] object-contain transition-all duration-700 rounded-lg",
+                                        isProcessing ? "blur-md scale-[0.98] opacity-80" : "blur-0 scale-100 opacity-100"
                                     )}
                                 />
 
@@ -222,11 +229,12 @@ export default function LabHandFixerPage() {
                                             initial={{ opacity: 0, scale: 0.8 }}
                                             animate={{ opacity: 1, scale: 1 }}
                                             whileHover={{ scale: 1.02 }}
+                                            whileTap={{ scale: 0.98 }}
                                             className={cn(
-                                                "absolute border-2 rounded-lg cursor-pointer transition-colors duration-300 backdrop-blur-[2px]",
+                                                "absolute border-2 rounded-lg cursor-pointer transition-all duration-300 backdrop-blur-[2px] focus-visible:ring-4 focus-visible:ring-primary focus-visible:outline-none",
                                                 isSelected
-                                                    ? "border-primary bg-primary/10 shadow-[0_0_20px_rgba(var(--primary),0.3)]"
-                                                    : "border-white/50 bg-white/5 hover:border-primary/60 hover:bg-primary/5"
+                                                    ? "border-primary bg-primary/20 shadow-[0_0_20px_rgba(var(--primary),0.3)] z-30"
+                                                    : "border-white/50 bg-white/10 hover:border-primary/60 hover:bg-primary/5 z-20"
                                             )}
                                             style={{
                                                 left: `${hand.x}%`,
@@ -235,18 +243,20 @@ export default function LabHandFixerPage() {
                                                 height: `${hand.height}%`
                                             }}
                                             onClick={() => setSelectedHandId(hand.id)}
+                                            aria-label={`Select ${hand.label}`}
+                                            aria-pressed={isSelected}
                                         >
                                             <div className={cn(
-                                                "absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 rounded-md bg-background/90 text-[10px] font-bold shadow-sm whitespace-nowrap transition-opacity pointer-events-none",
-                                                isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                                                "absolute -top-8 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-md bg-background/95 backdrop-blur-sm text-[10px] font-bold shadow-md border border-border transition-all pointer-events-none uppercase tracking-wider",
+                                                isSelected ? "opacity-100 translate-y-0" : "opacity-0 group-hover:opacity-100 translate-y-1"
                                             )}>
                                                 {hand.label}
                                             </div>
 
                                             {/* Selected Indicator Corner (Apple-style) */}
                                             {isSelected && (
-                                                <div className="absolute -right-1.5 -bottom-1.5 w-4 h-4 bg-primary rounded-full flex items-center justify-center shadow-sm">
-                                                    <CheckCircle2 className="w-2.5 h-2.5 text-white" />
+                                                <div className="absolute -right-2 -bottom-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center shadow-lg border-2 border-background">
+                                                    <CheckCircle2 className="w-3 h-3 text-white" />
                                                 </div>
                                             )}
                                         </motion.button>
@@ -299,20 +309,22 @@ export default function LabHandFixerPage() {
                                 </div>
 
                                 {/* Pose Selector */}
-                                <div className="grid grid-cols-6 gap-2">
+                                <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
                                     {POSES.map((pose) => (
                                         <button
                                             key={pose.id}
                                             onClick={() => setSelectedPoseId(pose.id)}
+                                            aria-label={`Change pose to ${pose.name}`}
+                                            aria-pressed={selectedPoseId === pose.id}
                                             className={cn(
-                                                "flex flex-col items-center justify-center gap-2 p-3 rounded-2xl border transition-all duration-200",
+                                                "flex flex-col items-center justify-center gap-2 p-3 rounded-2xl border transition-all duration-200 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none",
                                                 selectedPoseId === pose.id
                                                     ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20 scale-105"
                                                     : "bg-muted/30 border-transparent hover:bg-muted text-muted-foreground hover:text-foreground"
                                             )}
                                         >
-                                            <pose.icon className={cn("w-6 h-6", selectedPoseId === pose.id ? "text-primary-foreground" : "text-current")} />
-                                            <span className="text-[10px] font-medium text-center leading-tight">{pose.name}</span>
+                                            <pose.icon className={cn("w-5 h-5", selectedPoseId === pose.id ? "text-primary-foreground" : "text-current")} />
+                                            <span className="text-xs font-medium text-center leading-tight">{pose.name}</span>
                                         </button>
                                     ))}
                                 </div>

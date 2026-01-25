@@ -94,38 +94,42 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
                         {sidebarItems.map((item) => {
                             const isActive = pathname === item.href
                             const Icon = item.icon
+                            const Component = item.disabled ? 'div' : Link
+                            const href = item.disabled ? undefined : item.href
 
                             return (
-                                <Link
+                                <Component
                                     key={item.href}
-                                    href={item.disabled ? "#" : item.href}
+                                    href={href as any}
                                     aria-current={isActive ? 'page' : undefined}
+                                    aria-label={collapsed ? item.title : undefined}
+                                    title={collapsed ? item.title : undefined}
                                     className={cn(
-                                        "group flex items-center gap-4 rounded-2xl px-3 py-3.5 transition-all duration-300 relative",
+                                        "group flex items-center gap-4 rounded-2xl px-3 py-3.5 transition-all duration-300 relative focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none",
                                         isActive
                                             ? "bg-primary text-primary-foreground shadow-lg shadow-primary/10"
                                             : "hover:bg-accent/50 text-muted-foreground hover:text-foreground",
                                         item.disabled && "cursor-not-allowed opacity-40 hover:bg-transparent"
                                     )}
                                 >
-                                    <Icon className={cn("size-5 shrink-0 transition-transform duration-300", !isActive && "group-hover:scale-110")} />
+                                    <Icon className={cn("size-5 shrink-0 transition-transform duration-300", !isActive && !item.disabled && "group-hover:scale-110")} />
                                     {!collapsed && (
                                         <div className="flex flex-col min-w-0 flex-1">
                                             <span className="font-semibold text-sm leading-none whitespace-nowrap overflow-hidden text-ellipsis">
                                                 {item.title}
                                             </span>
                                             <span className={cn(
-                                                "text-[10px] mt-1 whitespace-nowrap overflow-hidden text-ellipsis",
-                                                isActive ? "text-primary-foreground/70" : "text-muted-foreground/60"
+                                                "text-xs mt-1 whitespace-nowrap overflow-hidden text-ellipsis font-medium",
+                                                isActive ? "text-primary-foreground/80" : "text-muted-foreground/70"
                                             )}>
                                                 {item.description}
                                             </span>
                                         </div>
                                     )}
                                     {isActive && !collapsed && (
-                                        <div className="size-1.5 rounded-full bg-primary-foreground absolute right-4" />
+                                        <div className="size-2 rounded-full bg-primary-foreground absolute right-4 shadow-sm" />
                                     )}
-                                </Link>
+                                </Component>
                             )
                         })}
                     </nav>

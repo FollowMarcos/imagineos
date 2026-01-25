@@ -42,13 +42,13 @@ export function PromptCard({ prompt, isShared, onShare, onDelete, onClone, onUse
     return (
         <motion.div
             className={cn(
-                "relative z-20 w-full aspect-[4/5] rounded-[32px] overflow-hidden group hover:z-50 bg-background border border-border/40 shadow-sm hover:shadow-2xl transition-all duration-500"
+                "relative z-20 w-full aspect-[4/5] rounded-[32px] overflow-hidden group hover:z-50 bg-background border border-border/40 shadow-sm hover:shadow-2xl transition-all duration-500 focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2"
             )}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             whileHover={{
-                y: -8,
-                transition: { duration: 0.4, ease: [0.23, 1, 0.32, 1] },
+                y: -4,
+                transition: { duration: 0.3, ease: "easeOut" },
             }}
         >
             {/* Image Layer */}
@@ -57,7 +57,7 @@ export function PromptCard({ prompt, isShared, onShare, onDelete, onClone, onUse
                     <img
                         src={coverImage}
                         alt={prompt.title}
-                        className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105 will-change-transform"
+                        className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03] transform-gpu"
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center bg-muted/30 text-muted-foreground/40">
@@ -70,7 +70,7 @@ export function PromptCard({ prompt, isShared, onShare, onDelete, onClone, onUse
 
             {/* Top Badge (Content Type) */}
             <div className="absolute top-4 left-4 z-30">
-                <div className="bg-white/95 dark:bg-black/90 py-1.5 px-3 rounded-full text-[10px] font-bold tracking-wider text-foreground uppercase shadow-sm border border-white/10 dark:border-white/5">
+                <div className="bg-white/95 dark:bg-black/90 py-1.5 px-3 rounded-full text-xs font-bold tracking-wider text-foreground uppercase shadow-sm border border-white/10 dark:border-white/5">
                     {prompt.content_type}
                 </div>
             </div>
@@ -78,8 +78,8 @@ export function PromptCard({ prompt, isShared, onShare, onDelete, onClone, onUse
             {/* Top Right (Shared Badge) */}
             {isShared && prompt.shared_by && (
                 <div className="absolute top-4 right-4 z-30">
-                    <div className="bg-primary text-white py-1.5 px-3 rounded-full text-[10px] font-bold tracking-wider uppercase shadow-lg flex items-center gap-1">
-                        <UserIcon size={10} />
+                    <div className="bg-primary text-white py-1.5 px-3 rounded-full text-xs font-bold tracking-wider uppercase shadow-lg flex items-center gap-1.5">
+                        <UserIcon size={12} />
                         @{prompt.shared_by.username}
                     </div>
                 </div>
@@ -101,10 +101,10 @@ export function PromptCard({ prompt, isShared, onShare, onDelete, onClone, onUse
                     </span>
                 </div>
 
-                {/* Tags (Visible on Hover) */}
-                <div className="h-0 group-hover:h-auto overflow-hidden opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-wrap gap-1.5">
+                {/* Tags (Visible on Hover) - Using a more stable reveal */}
+                <div className="max-h-0 group-hover:max-h-20 overflow-hidden opacity-0 group-hover:opacity-100 transition-all duration-500 ease-in-out flex flex-wrap gap-1.5">
                     {prompt.tags.slice(0, 3).map(tag => (
-                        <span key={tag} className="text-[10px] text-white/90 bg-white/20 px-2.5 py-1 rounded-md font-medium">
+                        <span key={tag} className="text-xs text-white/90 bg-white/20 px-2.5 py-1 rounded-md font-medium backdrop-blur-sm">
                             #{tag}
                         </span>
                     ))}
@@ -128,6 +128,7 @@ export function PromptCard({ prompt, isShared, onShare, onDelete, onClone, onUse
                                 action.onClick(prompt);
                             }}
                             title={action.label}
+                            aria-label={action.label}
                         >
                             {action.icon}
                         </Button>
