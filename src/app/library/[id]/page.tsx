@@ -6,11 +6,12 @@ import { createClient } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Loader2, CopyIcon, EditIcon, Share2Icon, DownloadCloudIcon, ChevronLeftIcon } from "lucide-react";
+import { Loader2, CopyIcon, EditIcon, Share2Icon, DownloadCloudIcon, ChevronLeftIcon, SparklesIcon } from "lucide-react";
 import { toast } from "sonner";
 import { PromptData } from "@/components/library/prompt-form";
 import Link from "next/link";
 import { ShareDialog } from "@/components/library/share-dialog";
+import { useCreative } from "@/context/creative-context";
 
 // Extended Prompt type
 interface Prompt extends PromptData {
@@ -34,6 +35,8 @@ export default function SinglePromptPage() {
 
     // Dialog State
     const [isShareOpen, setIsShareOpen] = useState(false);
+
+    const { usePrompt } = useCreative();
 
     useEffect(() => {
         fetchPrompt();
@@ -94,6 +97,16 @@ export default function SinglePromptPage() {
         }
     };
 
+    const handleUsePrompt = () => {
+        if (!prompt) return;
+        usePrompt({
+            prompt: prompt.positive_prompt,
+            negativePrompt: prompt.negative_prompt || "",
+            model: prompt.models?.[0] || "Imagine V6",
+            aspectRatio: prompt.aspect_ratios?.[0] || "4:5"
+        });
+    };
+
     if (isLoading) {
         return <div className="flex h-[50vh] items-center justify-center"><Loader2 className="animate-spin text-muted-foreground w-8 h-8" /></div>;
     }
@@ -142,6 +155,9 @@ export default function SinglePromptPage() {
                             <div className="flex gap-2 shrink-0">
                                 {isOwner ? (
                                     <>
+                                        <Button className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg" onClick={handleUsePrompt}>
+                                            <SparklesIcon className="w-4 h-4 mr-2" /> Use
+                                        </Button>
                                         <Button variant="outline" size="icon" onClick={() => setIsShareOpen(true)}>
                                             <Share2Icon className="w-4 h-4" />
                                         </Button>
@@ -152,9 +168,14 @@ export default function SinglePromptPage() {
                                         </Link>
                                     </>
                                 ) : (
-                                    <Button onClick={handleClone} className="gap-2">
-                                        <DownloadCloudIcon className="w-4 h-4" /> Save Copy
-                                    </Button>
+                                    <>
+                                        <Button className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg" onClick={handleUsePrompt}>
+                                            <SparklesIcon className="w-4 h-4 mr-2" /> Use
+                                        </Button>
+                                        <Button onClick={handleClone} className="gap-2" variant="secondary">
+                                            <DownloadCloudIcon className="w-4 h-4" /> Save Copy
+                                        </Button>
+                                    </>
                                 )}
                             </div>
                         </div>

@@ -23,6 +23,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
 import BottomMenu from "@/components/bottom-menu"
 import { createClient } from "@/utils/supabase/server"
+import { CreativeProvider } from "@/context/creative-context"
 
 export default async function RootLayout({
   children,
@@ -43,9 +44,11 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
-          {user && <BottomMenu />}
-          <Toaster />
+          <CreativeProvider>
+            {children}
+            {user && <BottomMenu />}
+            <Toaster />
+          </CreativeProvider>
         </ThemeProvider>
       </body>
     </html>

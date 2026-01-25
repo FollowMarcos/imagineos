@@ -24,6 +24,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
+import { useCreative } from "@/context/creative-context";
+
 const MAIN_NAV = [
   { icon: HomeIcon, name: "home", href: "/" },
   { icon: LibraryIcon, name: "library", href: "/library" },
@@ -37,14 +39,27 @@ const MODELS = ["Imagine V6", "Realism XL", "Turbo Render"];
 
 const BottomMenu = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isCreativeMode, setIsCreativeMode] = useState(false);
+  // const [isCreativeMode, setIsCreativeMode] = useState(false); // REMOVED LOCAL STATE
+  const {
+    isOpen: isCreativeMode,
+    setIsOpen: setIsCreativeMode,
+    prompt,
+    setPrompt,
+    negativePrompt,
+    setNegativePrompt,
+    model,
+    setModel,
+    aspectRatio,
+    setAspectRatio
+  } = useCreative();
+
   const pathname = usePathname();
 
-  // Creative Mode State
-  const [prompt, setPrompt] = useState("");
-  const [aspectRatio, setAspectRatio] = useState("4:5");
+  // const [prompt, setPrompt] = useState(""); // REMOVED LOCAL
+  // const [aspectRatio, setAspectRatio] = useState("4:5"); // REMOVED LOCAL
   const [count, setCount] = useState(1);
-  const [model, setModel] = useState(MODELS[0]);
+  // const [model, setModel] = useState(MODELS[0]); // REMOVED LOCAL
+  const [isNegativeOpen, setIsNegativeOpen] = useState(false); // Internal UI state
 
   // Generation State (Mockup)
   const [isGenerating, setIsGenerating] = useState(false);
@@ -56,11 +71,10 @@ const BottomMenu = () => {
 
   const startGeneration = () => {
     setIsGenerating(true);
-    // Mockup: Show all 4 states simultaneously to verify design and colors
     setGeneratedItems([
       { id: 0, status: 'success', referenceImage: "https://picsum.photos/id/64/100/100" },
       { id: 1, status: 'failed' },
-      { id: 2, status: 'generating' }, // Spinning orange
+      { id: 2, status: 'generating' },
       { id: 3, status: 'pending' },
     ]);
   };
@@ -110,10 +124,9 @@ const BottomMenu = () => {
                     "w-12 h-12 rounded-full border-2 border-background overflow-hidden relative flex items-center justify-center transition-all bg-muted",
                     item.status === 'success' && "ring-2 ring-lime-500 ring-offset-2 ring-offset-background",
                     item.status === 'failed' && "ring-2 ring-red-500 ring-offset-2 ring-offset-background",
-                    // Generating internal border handled below
                   )}
                 >
-                  {/* Base Layer: Reference or Special Placeholder */}
+                  {/* ... (Image Content) ... SAME AS BEFORE */}
                   <div className={cn(
                     "absolute inset-0 flex items-center justify-center transition-opacity duration-500",
                     item.status === 'success' ? "opacity-0" : "opacity-100"
@@ -126,16 +139,12 @@ const BottomMenu = () => {
                       </div>
                     )}
                   </div>
-
-                  {/* Overlay: Generation Shimmer & Spinning Border */}
                   {item.status === 'generating' && (
                     <>
                       <div className="absolute inset-0 bg-white/20 animate-pulse mix-blend-overlay" />
                       <div className="absolute inset-0 rounded-full border-[2.5px] border-orange-500 border-t-transparent animate-spin z-30" style={{ animationDuration: '1s' }} />
                     </>
                   )}
-
-                  {/* Success Layer: Generated Image */}
                   {item.status === 'success' && (
                     <motion.img
                       initial={{ opacity: 0 }}
@@ -145,11 +154,10 @@ const BottomMenu = () => {
                       alt="Generated"
                     />
                   )}
-
-                  {/* Failed Layer */}
                   {item.status === 'failed' && (
                     <div className="relative z-20 text-destructive font-bold text-xs bg-background/80 w-full h-full flex items-center justify-center">!</div>
                   )}
+
                 </motion.div>
               ))}
             </div>
@@ -261,34 +269,60 @@ const BottomMenu = () => {
                 className="flex flex-col p-4 gap-6 w-full"
               >
                 {/* Top Row: Input */}
-                <div className="flex items-start gap-4">
-                  <div className="flex-1 relative pt-1">
-                    <Button variant="ghost" size="icon" className="absolute left-0 top-1 h-8 w-8 text-muted-foreground/70 hover:text-foreground rounded-full">
-                      <PlusIcon size={18} />
-                    </Button>
-                    <textarea
-                      autoFocus
-                      value={prompt}
-                      onChange={(e) => setPrompt(e.target.value)}
-                      placeholder="Describe the scene you imagine..."
-                      className="w-full bg-transparent border-none resize-none outline-none text-xl leading-relaxed min-h-[80px] pl-10 placeholder:text-muted-foreground/40 font-medium"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Escape') setIsCreativeMode(false);
-                      }}
-                    />
-                  </div>
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-start gap-4">
+                    <div className="flex-1 relative pt-1">
+                      <Button variant="ghost" size="icon" className="absolute left-0 top-1 h-8 w-8 text-muted-foreground/70 hover:text-foreground rounded-full">
+                        <PlusIcon size={18} />
+                      </Button>
+                      <textarea
+                        autoFocus
+                        value={prompt}
+                        onChange={(e) => setPrompt(e.target.value)}
+                        placeholder="Describe the scene you imagine..."
+                        className="w-full bg-transparent border-none resize-none outline-none text-xl leading-relaxed min-h-[60px] pl-10 placeholder:text-muted-foreground/40 font-medium"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Escape') setIsCreativeMode(false);
+                          // Submit logic could go here
+                        }}
+                      />
+                    </div>
 
-                  {/* Action Buttons: Close & Generate */}
-                  <div className="flex flex-col gap-2 shrink-0">
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="rounded-full h-8 w-8 ml-auto hover:bg-muted"
-                      onClick={() => setIsCreativeMode(false)}
-                    >
-                      <XIcon size={18} />
-                    </Button>
+                    {/* Action Buttons: Close & Generate */}
+                    <div className="flex flex-col gap-2 shrink-0">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="rounded-full h-8 w-8 ml-auto hover:bg-muted"
+                        onClick={() => setIsCreativeMode(false)}
+                      >
+                        <XIcon size={18} />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className={cn("rounded-full h-8 w-8 ml-auto hover:bg-muted transition-transform", isNegativeOpen && "rotate-180 bg-muted/50")}
+                        onClick={() => setIsNegativeOpen(!isNegativeOpen)}
+                        title="Negative Prompt"
+                      >
+                        <ChevronRightIcon size={18} className="rotate-90" />
+                      </Button>
+                    </div>
                   </div>
+                  {isNegativeOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      className="pl-10 pr-12 overflow-hidden"
+                    >
+                      <textarea
+                        value={negativePrompt}
+                        onChange={(e) => setNegativePrompt(e.target.value)}
+                        placeholder="Negative prompt (what to avoid)..."
+                        className="w-full bg-muted/30 rounded-lg p-2 text-sm border-none resize-none outline-none text-muted-foreground min-h-[40px] placeholder:text-muted-foreground/30 font-medium"
+                      />
+                    </motion.div>
+                  )}
                 </div>
 
                 {/* Bottom Row: Controls */}

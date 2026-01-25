@@ -17,32 +17,43 @@ interface ShareDialogProps {
 }
 
 export function ShareDialog({ prompt, isOpen, onClose }: ShareDialogProps) {
-    const [username, setUsername] = useState("");
+    const [query, setQuery] = useState("");
+    const [results, setResults] = useState<{ id: string; username: string; full_name: string }[]>([]);
+    const [selectedUser, setSelectedUser] = useState<{ id: string; username: string } | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [isSearching, setIsSearching] = useState(false);
     const supabase = createClient();
 
+    // Debounced search
+    useEffect(() => {
+        const searchUsers = async () => {
+            if (query.length < 2) {
+                setResults([]);
+                return;
+            }
+            setIsSearching(true);
+
+            const { data } = await supabase
+                .from('profiles')
+                .select('id, username, full_name')
+                .or(`username.ilike.%${query}%,full_name.ilike.%${query}%`)
+                .limit(5);
+
+            if (data) setResults(data);
+            setIsSearching(false);
+        };
+
+        const timer = setTimeout(searchUsers, 300);
+        return () => clearTimeout(timer);
+    }, [query]);
+
     const handleShare = async () => {
-        if (!prompt || !username) return;
+        if (!prompt || !selectedUser) return;
         setIsLoading(true);
 
         try {
-            // 1. Find User ID by Username
-            // Assuming a public 'profiles' table exists.
-            const { data: profile, error: profileError } = await supabase
-                .from('profiles')
-                .select('id')
-                .eq('username', username)
-                .single();
-
-            if (profileError || !profile) {
-                toast.error("User not found", { description: "Double check the username." });
-                setIsLoading(false);
-                return;
-            }
-
-            if (profile.id === prompt.user_id) {
-                toast.error("You cannot share with yourself"); // Logic handled?
-                setIsLoading(false);
+            if (selectedUser.id === prompt.user_id) {
+                toast.error("You cannot share with yourself");
                 return;
             }
 
@@ -52,19 +63,20 @@ export function ShareDialog({ prompt, isOpen, onClose }: ShareDialogProps) {
                 .insert({
                     prompt_id: prompt.id,
                     shared_by_user_id: prompt.user_id,
-                    shared_with_user_id: profile.id
+                    shared_with_user_id: selectedUser.id
                 });
 
             if (shareError) {
-                if (shareError.code === '23505') { // Unique violation if constrained
+                if (shareError.code === '23505') {
                     toast.error("Already shared with this user");
                 } else {
                     toast.error("Failed to share", { description: shareError.message });
                 }
             } else {
-                toast.success(`Shared "${prompt.title}" with @${username}`);
+                toast.success(`Shared "${prompt.title}" with @${selectedUser.username}`);
                 onClose();
-                setUsername("");
+                setQuery("");
+                setSelectedUser(null);
             }
 
         } catch (e) {
@@ -76,29 +88,62 @@ export function ShareDialog({ prompt, isOpen, onClose }: ShareDialogProps) {
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent>
+            <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle>Share Prompt</DialogTitle>
                     <DialogDescription>
-                        Share <strong>{prompt?.title}</strong> with another user. They will see it in their "Shared with Me" library.
+                        Share <strong>{prompt?.title}</strong> with another user.
                     </DialogDescription>
                 </DialogHeader>
 
                 <div className="grid gap-4 py-4">
-                    <div className="grid gap-2">
-                        <Label>Recipient Username</Label>
-                        <div className="flex gap-2">
-                            <Input
-                                placeholder="Enter exact username..."
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                onKeyDown={(e) => e.key === 'Enter' && handleShare()}
-                            />
-                            <Button disabled={!username || isLoading} onClick={handleShare}>
-                                {isLoading ? <Loader2 className="animate-spin" /> : <UserPlusIcon size={16} />}
-                            </Button>
-                        </div>
+                    <div className="grid gap-2 relative">
+                        <Label>Recipient</Label>
+
+                        {selectedUser ? (
+                            <div className="flex items-center gap-2 p-2 border rounded-md bg-muted/50">
+                                <div className="flex-1 font-medium">@{selectedUser.username}</div>
+                                <Button size="sm" variant="ghost" onClick={() => { setSelectedUser(null); setQuery(""); }}>
+                                    <XIcon size={14} />
+                                </Button>
+                            </div>
+                        ) : (
+                            <div className="relative">
+                                <Input
+                                    placeholder="Search by username..."
+                                    value={query}
+                                    onChange={(e) => setQuery(e.target.value)}
+                                />
+                                {isSearching && <div className="absolute right-3 top-2.5"><Loader2 className="animate-spin h-4 w-4 text-muted-foreground" /></div>}
+
+                                {/* Dropdown Results */}
+                                {results.length > 0 && (
+                                    <div className="absolute top-full left-0 right-0 mt-1 bg-popover border rounded-md shadow-md z-50 overflow-hidden">
+                                        {results.map(user => (
+                                            <div
+                                                key={user.id}
+                                                className="px-3 py-2 hover:bg-muted cursor-pointer flex flex-col"
+                                                onClick={() => {
+                                                    setSelectedUser(user);
+                                                    setResults([]);
+                                                }}
+                                            >
+                                                <span className="font-medium text-sm">@{user.username}</span>
+                                                {user.full_name && <span className="text-xs text-muted-foreground">{user.full_name}</span>}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
+                </div>
+
+                <div className="flex justify-end gap-2">
+                    <Button variant="ghost" onClick={onClose}>Cancel</Button>
+                    <Button disabled={!selectedUser || isLoading} onClick={handleShare}>
+                        {isLoading ? "Sharing..." : "Share Prompt"}
+                    </Button>
                 </div>
             </DialogContent>
         </Dialog>

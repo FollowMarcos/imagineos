@@ -10,6 +10,7 @@ import { PromptCard, Prompt } from "@/components/library/prompt-card";
 import { ShareDialog } from "@/components/library/share-dialog";
 import { createClient } from "@/utils/supabase/client"; // Assuming client utils exist
 import { toast } from "sonner";
+import { useCreative } from "@/context/creative-context";
 
 export default function LibraryPage() {
     const [activeTab, setActiveTab] = useState("my-prompts");
@@ -22,6 +23,7 @@ export default function LibraryPage() {
     const [isShareOpen, setIsShareOpen] = useState(false);
     const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
 
+    const { usePrompt } = useCreative();
     const supabase = createClient();
 
     useEffect(() => {
@@ -118,6 +120,15 @@ export default function LibraryPage() {
         }
     };
 
+    const handleUsePrompt = (prompt: Prompt) => {
+        usePrompt({
+            prompt: prompt.positive_prompt,
+            negativePrompt: prompt.negative_prompt || "",
+            model: prompt.models?.[0] || "Imagine V6",
+            aspectRatio: prompt.aspect_ratios?.[0] || "4:5"
+        });
+    };
+
     const currentList = activeTab === "my-prompts" ? prompts : sharedPrompts;
 
     // Client-Side Search
@@ -188,6 +199,7 @@ export default function LibraryPage() {
                                     setSelectedPrompt(p);
                                     setIsShareOpen(true);
                                 }}
+                                onUse={handleUsePrompt}
                             />
                         ))}
                     </div>

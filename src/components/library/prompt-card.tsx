@@ -8,12 +8,11 @@ import {
     Trash2Icon,
     EditIcon,
     DownloadCloudIcon,
-    UserIcon
+    UserIcon,
+    SparklesIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-
-
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -35,9 +34,10 @@ interface PromptCardProps {
     onShare?: (prompt: Prompt) => void;
     onDelete?: (prompt: Prompt) => void;
     onClone?: (prompt: Prompt) => void;
+    onUse?: (prompt: Prompt) => void;
 }
 
-export function PromptCard({ prompt, isShared, onShare, onDelete, onClone }: PromptCardProps) {
+export function PromptCard({ prompt, isShared, onShare, onDelete, onClone, onUse }: PromptCardProps) {
     const coverImage = prompt.images?.[0] || null;
 
     return (
@@ -60,10 +60,10 @@ export function PromptCard({ prompt, isShared, onShare, onDelete, onClone }: Pro
                 </Link>
 
                 {/* Overlay Gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
                 {/* Top Badges */}
-                <div className="absolute top-2 left-2 flex flex-wrap gap-1">
+                <div className="absolute top-2 left-2 flex flex-wrap gap-1 pointer-events-none">
                     <Badge variant="secondary" className="backdrop-blur-md bg-white/20 text-white border-none text-[10px] h-5">
                         {prompt.content_type}
                     </Badge>
@@ -76,29 +76,63 @@ export function PromptCard({ prompt, isShared, onShare, onDelete, onClone }: Pro
                 </div>
 
                 {/* Hover Actions */}
-                <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 flex items-center justify-between gap-2 pointer-events-none">
+                <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 flex items-center justify-between gap-2 z-10">
 
                     {/* Primary Action */}
                     {isShared ? (
-                        <Button
-                            size="sm"
-                            className="w-full bg-white text-black hover:bg-white/90 pointer-events-auto"
-                            onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                onClone?.(prompt);
-                            }}
-                        >
-                            <DownloadCloudIcon className="w-4 h-4 mr-2" />
-                            Save Copy
-                        </Button>
+                        <div className="flex w-full gap-2">
+                            <Button
+                                size="sm"
+                                className="flex-1 bg-white text-black hover:bg-white/90 shadow-sm"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    onClone?.(prompt);
+                                }}
+                            >
+                                <DownloadCloudIcon className="w-4 h-4 mr-2" />
+                                Save Copy
+                            </Button>
+                            {/* Use Button for Shared */}
+                            {onUse && (
+                                <Button
+                                    size="icon"
+                                    className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        onUse(prompt);
+                                    }}
+                                    title="Use this prompt"
+                                >
+                                    <SparklesIcon className="w-4 h-4" />
+                                </Button>
+                            )}
+                        </div>
                     ) : (
-                        <div className="flex w-full gap-2 pointer-events-auto">
-                            <Link href={`/library/${prompt.id}/edit`} className="flex-1">
+                        <div className="flex w-full gap-2">
+                            {/* Use Button for Owned */}
+                            {onUse && (
+                                <Button
+                                    size="sm"
+                                    className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm flex-1"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        onUse(prompt);
+                                    }}
+                                >
+                                    <SparklesIcon className="w-4 h-4 mr-2" />
+                                    Use
+                                </Button>
+                            )}
+
+                            <Link href={`/library/${prompt.id}/edit`} className={onUse ? "" : "flex-1"}>
                                 <Button size="sm" variant="secondary" className="w-full bg-white/10 hover:bg-white/20 text-white border-none backdrop-blur-md">
-                                    <EditIcon className="w-4 h-4 mr-1" /> Edit
+                                    <EditIcon className="w-4 h-4 mr-1" /> {onUse ? "" : "Edit"}
                                 </Button>
                             </Link>
+
                             <Button
                                 size="icon"
                                 variant="secondary"
