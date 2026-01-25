@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { SettingsIcon, ScissorsIcon, LayersIcon, WrenchIcon, PanelLeftIcon, PanelRightIcon } from "lucide-react"
+import { SettingsIcon, ScissorsIcon, LayersIcon, WrenchIcon, ArrowLeftRightIcon } from "lucide-react"
 import {
     Tooltip,
     TooltipContent,
@@ -115,19 +115,8 @@ export default function LeftDock() {
                     })}
                 </nav>
 
-                {/* Spacer */}
-                <div className="flex-1 min-h-[40px]" />
-
                 {/* Settings & Toggle */}
                 <div className="flex flex-col items-center gap-3">
-                    <button
-                        onClick={togglePosition}
-                        className="p-3 flex items-center justify-center transition-all duration-300 relative group hover:scale-110 text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                        style={{ borderRadius: "calc(var(--radius) * 1.5)" }}
-                    >
-                        {dockPosition === 'left' ? <PanelRightIcon className="size-5" /> : <PanelLeftIcon className="size-5" />}
-                    </button>
-
                     <div className="w-4 h-px bg-border/50" />
 
                     <Link
@@ -150,6 +139,14 @@ export default function LeftDock() {
                             />
                         )}
                     </Link>
+
+                    <button
+                        onClick={togglePosition}
+                        className="p-3 flex items-center justify-center transition-all duration-300 relative group hover:scale-110 text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                        style={{ borderRadius: "calc(var(--radius) * 1.5)" }}
+                    >
+                        <ArrowLeftRightIcon className="size-5" />
+                    </button>
                 </div>
             </aside>
         </TooltipProvider>
