@@ -71,8 +71,11 @@ export default function LibraryPage() {
                     shared_by: { username: "User" } // Temporary placeholder to avoid join issues
                 }));
 
-            console.log("Mapped Shared Prompts:", mapped);
-            setSharedPrompts(mapped);
+            // Deduplicate by ID
+            const unique = Array.from(new Map(mapped.map((p: any) => [p.id, p])).values());
+
+            console.log("Mapped Shared Prompts:", unique);
+            setSharedPrompts(unique as Prompt[]);
         }
 
         setIsLoading(false);
