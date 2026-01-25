@@ -1,6 +1,8 @@
 
 "use client"
 
+import React from "react"
+
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
@@ -55,24 +57,26 @@ export function TapNavigation() {
                             <Link
                                 href={tool.href}
                                 className={cn(
-                                    "p-3 rounded-2xl transition-all duration-300 relative group hover:scale-110",
+                                    "p-3 flex items-center justify-center transition-all duration-300 relative group hover:scale-110",
                                     isActive
                                         ? "text-primary-foreground"
-                                        : "text-muted-foreground hover:bg-primary/10 hover:text-primary"
+                                        : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
                                 )}
+                                style={{ borderRadius: "calc(var(--radius) * 1.5)" }}
                             >
                                 <Icon className="size-5 relative z-10" />
                                 {isActive && (
                                     <motion.div
                                         layoutId="tap-dock-active"
-                                        className="absolute inset-0 bg-primary rounded-2xl shadow-lg shadow-primary/25"
+                                        className="absolute inset-0 bg-primary shadow-lg shadow-primary/25"
+                                        style={{ borderRadius: "calc(var(--radius) * 1.5)" }}
                                         transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                                     />
                                 )}
                             </Link>
                         )
 
-                        if (isScissors) return <div key={tool.href}>{link}</div>
+                        if (isScissors) return <React.Fragment key={tool.href}>{link}</React.Fragment>
 
                         return (
                             <Tooltip key={tool.href}>
