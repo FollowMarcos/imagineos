@@ -22,6 +22,7 @@ export const metadata: Metadata = {
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
 import BottomMenu from "@/components/bottom-menu"
+import LeftDock from "@/components/left-dock"
 import { createClient } from "@/utils/supabase/server"
 import { CreativeProvider } from "@/context/creative-context"
 import { CustomThemeProvider } from "@/context/custom-theme-context"
@@ -48,7 +49,12 @@ export default async function RootLayout({
           <CustomThemeProvider>
             <CreativeProvider>
               {children}
-              {user && <BottomMenu />}
+              {user && (
+                <>
+                  <LeftDock />
+                  <BottomMenu />
+                </>
+              )}
               <Toaster />
             </CreativeProvider>
           </CustomThemeProvider>
