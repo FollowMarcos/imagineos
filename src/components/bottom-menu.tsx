@@ -12,7 +12,6 @@ import {
   PlusIcon,
   Settings2Icon,
   ChevronRightIcon,
-  HistoryIcon,
   LibraryIcon,
   FlaskConicalIcon,
   MoonIcon,
@@ -33,7 +32,7 @@ import { useCreative } from "@/context/creative-context";
 const MAIN_NAV = [
   { icon: HomeIcon, name: "home", href: "/" },
   { icon: LibraryIcon, name: "library", href: "/library" },
-  { icon: HistoryIcon, name: "gallery", href: "/gallery" },
+  { icon: ImageIcon, name: "gallery", href: "/gallery" },
   { icon: SparklesIcon, name: "create", href: null }, // The trigger
   { icon: FlaskConicalIcon, name: "lab", href: "/lab" },
   { icon: UserIcon, name: "profile", href: "/settings/profile" },
