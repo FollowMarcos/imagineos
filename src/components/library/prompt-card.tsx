@@ -45,17 +45,19 @@ export function PromptCard({ prompt, isShared, onShare, onDelete, onClone }: Pro
 
             {/* Cover Image Area */}
             <div className="relative aspect-[4/5] bg-muted overflow-hidden">
-                {coverImage ? (
-                    <img
-                        src={coverImage}
-                        alt={prompt.title}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-muted/50 text-muted-foreground/50">
-                        <span className="text-xs font-mono">No Preview</span>
-                    </div>
-                )}
+                <Link href={`/library/${prompt.id}`} className="block w-full h-full cursor-pointer">
+                    {coverImage ? (
+                        <img
+                            src={coverImage}
+                            alt={prompt.title}
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
+                    ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-muted/50 text-muted-foreground/50">
+                            <span className="text-xs font-mono">No Preview</span>
+                        </div>
+                    )}
+                </Link>
 
                 {/* Overlay Gradient */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -74,20 +76,24 @@ export function PromptCard({ prompt, isShared, onShare, onDelete, onClone }: Pro
                 </div>
 
                 {/* Hover Actions */}
-                <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 flex items-center justify-between gap-2">
+                <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 flex items-center justify-between gap-2 pointer-events-none">
 
                     {/* Primary Action */}
                     {isShared ? (
                         <Button
                             size="sm"
-                            className="w-full bg-white text-black hover:bg-white/90"
-                            onClick={() => onClone?.(prompt)}
+                            className="w-full bg-white text-black hover:bg-white/90 pointer-events-auto"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                onClone?.(prompt);
+                            }}
                         >
                             <DownloadCloudIcon className="w-4 h-4 mr-2" />
                             Save Copy
                         </Button>
                     ) : (
-                        <div className="flex w-full gap-2">
+                        <div className="flex w-full gap-2 pointer-events-auto">
                             <Link href={`/library/${prompt.id}/edit`} className="flex-1">
                                 <Button size="sm" variant="secondary" className="w-full bg-white/10 hover:bg-white/20 text-white border-none backdrop-blur-md">
                                     <EditIcon className="w-4 h-4 mr-1" /> Edit
@@ -97,7 +103,11 @@ export function PromptCard({ prompt, isShared, onShare, onDelete, onClone }: Pro
                                 size="icon"
                                 variant="secondary"
                                 className="bg-white/10 hover:bg-white/20 text-white border-none backdrop-blur-md"
-                                onClick={() => onShare?.(prompt)}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    onShare?.(prompt);
+                                }}
                             >
                                 <Share2Icon className="w-4 h-4" />
                             </Button>
@@ -105,7 +115,11 @@ export function PromptCard({ prompt, isShared, onShare, onDelete, onClone }: Pro
                                 size="icon"
                                 variant="destructive"
                                 className="bg-red-500/80 hover:bg-red-500 text-white border-none backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity delay-75"
-                                onClick={() => onDelete?.(prompt)}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    onDelete?.(prompt);
+                                }}
                             >
                                 <Trash2Icon className="w-4 h-4" />
                             </Button>
@@ -116,9 +130,11 @@ export function PromptCard({ prompt, isShared, onShare, onDelete, onClone }: Pro
 
             {/* Info Content */}
             <div className="p-3 flex flex-col gap-1 flex-1 bg-card">
-                <h3 className="font-semibold text-sm truncate leading-tight" title={prompt.title}>
-                    {prompt.title}
-                </h3>
+                <Link href={`/library/${prompt.id}`} className="hover:underline">
+                    <h3 className="font-semibold text-sm truncate leading-tight" title={prompt.title}>
+                        {prompt.title}
+                    </h3>
+                </Link>
                 <div className="flex items-center gap-2 overflow-hidden text-xs text-muted-foreground">
                     <span className="truncate max-w-full">
                         {prompt.models?.[0] || "Unknown Model"}

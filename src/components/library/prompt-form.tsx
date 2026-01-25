@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from "react";
 import { XIcon, UploadCloudIcon, PlusIcon, ImageIcon } from "lucide-react";
+import { resizeImage } from "@/lib/image-utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -85,17 +86,24 @@ export function PromptForm({ initialData, onSubmit, isLoading }: PromptFormProps
     };
 
     // --- Images ---
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // --- Images ---
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                if (typeof ev.target?.result === "string") {
-                    // In a real app, upload to storage here. For now using Base64/Blob.
-                    setFormData(prev => ({ ...prev, images: [...prev.images, ev.target!.result as string] }));
-                }
-            };
-            reader.readAsDataURL(file);
+            try {
+                const blob = await resizeImage(file, { maxWidth: 1200, maxHeight: 1200, quality: 0.8 });
+
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    if (typeof ev.target?.result === "string") {
+                        setFormData(prev => ({ ...prev, images: [...prev.images, ev.target!.result as string] }));
+                        toast.success("Image added (Optimized)");
+                    }
+                };
+                reader.readAsDataURL(blob);
+            } catch (err) {
+                toast.error("Failed to process image");
+            }
         }
     };
 
