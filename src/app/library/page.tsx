@@ -45,25 +45,33 @@ export default function LibraryPage() {
         if (myData) setPrompts(myData as Prompt[]);
 
         // 2. Fetch Shared Prompts (Inbox)
-        const { data: shareData } = await supabase
+        // 2. Fetch Shared Prompts (Inbox)
+        const { data: shareData, error } = await supabase
             .from('prompt_shares')
             .select(`
+            shared_by_user_id,
             prompt:prompts (
-                *,
-                user_id
-            ),
-            shared_by:shared_by_user_id (
-                email 
+                *
             )
         `)
             .eq('shared_with_user_id', user.id);
 
+        if (error) {
+            console.error("Share Fetch Error:", error);
+            toast.error("Failed to load shared prompts");
+        }
+
         if (shareData) {
-            // Map to Prompt type and hack username
-            const mapped = shareData.map((item: any) => ({
-                ...item.prompt,
-                shared_by: { username: item.shared_by?.email?.split('@')[0] || "Unknown" }
-            }));
+            console.log("Raw Share Data:", shareData);
+            // Map and Filter
+            const mapped = shareData
+                .filter((item: any) => item.prompt) // Ensure prompt exists
+                .map((item: any) => ({
+                    ...item.prompt,
+                    shared_by: { username: "User" } // Temporary placeholder to avoid join issues
+                }));
+
+            console.log("Mapped Shared Prompts:", mapped);
             setSharedPrompts(mapped);
         }
 
