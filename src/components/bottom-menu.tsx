@@ -15,6 +15,9 @@ import {
   HistoryIcon,
   LibraryIcon,
   FlaskConicalIcon,
+  MoonIcon,
+  SunIcon,
+  PaintbrushIcon,
 } from "lucide-react";
 import React, { useMemo, useState, useRef, useEffect } from "react";
 import { AnimatePresence, motion } from "motion/react";
@@ -23,12 +26,15 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { useTheme } from "next-themes";
+import { ThemeCustomizer } from "./theme/theme-customizer";
 
 import { useCreative } from "@/context/creative-context";
 
 const MAIN_NAV = [
   { icon: HomeIcon, name: "home", href: "/" },
   { icon: LibraryIcon, name: "library", href: "/library" },
+  { icon: HistoryIcon, name: "gallery", href: "/gallery" },
   { icon: SparklesIcon, name: "create", href: null }, // The trigger
   { icon: FlaskConicalIcon, name: "lab", href: "/lab" },
   { icon: UserIcon, name: "profile", href: "/settings/profile" },
@@ -60,6 +66,13 @@ const BottomMenu = () => {
   const [count, setCount] = useState(1);
   // const [model, setModel] = useState(MODELS[0]); // REMOVED LOCAL
   const [isNegativeOpen, setIsNegativeOpen] = useState(false); // Internal UI state
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const [isCustomizing, setIsCustomizing] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Generation State (Mockup)
   const [isGenerating, setIsGenerating] = useState(false);
@@ -255,6 +268,37 @@ const BottomMenu = () => {
                     </Link>
                   );
                 })}
+
+                <div className="w-px h-6 bg-border/50 mx-1" />
+
+                <button
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  className="p-3 rounded-2xl transition-all duration-300 relative group text-muted-foreground hover:bg-accent/50 hover:text-foreground hover:scale-105"
+                  aria-label="Toggle theme"
+                >
+                  {mounted ? (
+                    theme === "dark" ? (
+                      <SunIcon size={20} className="relative z-10" />
+                    ) : (
+                      <MoonIcon size={20} className="relative z-10" />
+                    )
+                  ) : (
+                    <div className="w-5 h-5" />
+                  )}
+                </button>
+
+                <button
+                  onClick={() => setIsCustomizing(!isCustomizing)}
+                  className={cn(
+                    "p-3 rounded-2xl transition-all duration-300 relative group hover:scale-105",
+                    isCustomizing ? "bg-primary/20 text-primary" : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+                  )}
+                  aria-label="Customize theme"
+                >
+                  <PaintbrushIcon size={20} className="relative z-10" />
+                </button>
+
+                <ThemeCustomizer isOpen={isCustomizing} onClose={() => setIsCustomizing(false)} />
               </motion.nav>
             ) : (
               // ----------------------------------------------------------------------
