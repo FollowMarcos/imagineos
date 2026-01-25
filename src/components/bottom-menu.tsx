@@ -17,7 +17,6 @@ import {
   FlaskConicalIcon,
   MoonIcon,
   SunIcon,
-  PaintbrushIcon,
 } from "lucide-react";
 import React, { useMemo, useState, useRef, useEffect } from "react";
 import { AnimatePresence, motion } from "motion/react";
@@ -45,7 +44,6 @@ const MODELS = ["Imagine V6", "Realism XL", "Turbo Render"];
 
 const BottomMenu = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  // const [isCreativeMode, setIsCreativeMode] = useState(false); // REMOVED LOCAL STATE
   const {
     isOpen: isCreativeMode,
     setIsOpen: setIsCreativeMode,
@@ -61,18 +59,24 @@ const BottomMenu = () => {
 
   const pathname = usePathname();
 
-  // const [prompt, setPrompt] = useState(""); // REMOVED LOCAL
-  // const [aspectRatio, setAspectRatio] = useState("4:5"); // REMOVED LOCAL
   const [count, setCount] = useState(1);
-  // const [model, setModel] = useState(MODELS[0]); // REMOVED LOCAL
   const [isNegativeOpen, setIsNegativeOpen] = useState(false); // Internal UI state
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [isCustomizing, setIsCustomizing] = useState(false);
+  const [seenFeatures, setSeenFeatures] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     setMounted(true);
+    const seen = localStorage.getItem("imagineos-seen-features");
+    if (seen) setSeenFeatures(JSON.parse(seen));
   }, []);
+
+  const markAsSeen = (feature: string) => {
+    const updated = { ...seenFeatures, [feature]: true };
+    setSeenFeatures(updated);
+    localStorage.setItem("imagineos-seen-features", JSON.stringify(updated));
+  };
 
   // Generation State (Mockup)
   const [isGenerating, setIsGenerating] = useState(false);
@@ -139,7 +143,6 @@ const BottomMenu = () => {
                     item.status === 'failed' && "ring-2 ring-red-500 ring-offset-2 ring-offset-background",
                   )}
                 >
-                  {/* ... (Image Content) ... SAME AS BEFORE */}
                   <div className={cn(
                     "absolute inset-0 flex items-center justify-center transition-opacity duration-500",
                     item.status === 'success' ? "opacity-0" : "opacity-100"
@@ -199,7 +202,7 @@ const BottomMenu = () => {
         )}
       </AnimatePresence>
 
-      <div className="pointer-events-auto w-full flex justify-center">
+      <div className="pointer-events-auto w-full flex justify-center relative">
         <motion.div
           layout
           transition={{
@@ -214,9 +217,6 @@ const BottomMenu = () => {
         >
           <AnimatePresence mode="popLayout" initial={false}>
             {!isCreativeMode ? (
-              // ----------------------------------------------------------------------
-              // DEFAULT DOCK MODE
-              // ----------------------------------------------------------------------
               <motion.nav
                 key="dock"
                 initial={{ opacity: 0 }}
@@ -249,6 +249,7 @@ const BottomMenu = () => {
                     <Link
                       key={item.name}
                       href={item.href || "#"}
+                      onClick={() => markAsSeen(item.name)}
                       className={cn(
                         "p-3 rounded-2xl transition-all duration-300 relative group",
                         isActive
@@ -258,6 +259,9 @@ const BottomMenu = () => {
                       aria-label={item.name}
                     >
                       <Icon size={20} className="relative z-10" />
+                      {!seenFeatures[item.name] && (item.name === 'gallery') && (
+                        <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full z-20 animate-pulse border-2 border-background" />
+                      )}
                       {isActive && (
                         <motion.div
                           layoutId="dock-active"
@@ -288,22 +292,23 @@ const BottomMenu = () => {
                 </button>
 
                 <button
-                  onClick={() => setIsCustomizing(!isCustomizing)}
+                  onClick={() => {
+                    setIsCustomizing(!isCustomizing);
+                    markAsSeen('settings');
+                  }}
                   className={cn(
                     "p-3 rounded-2xl transition-all duration-300 relative group hover:scale-105",
                     isCustomizing ? "bg-primary/20 text-primary" : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
                   )}
                   aria-label="Customize theme"
                 >
-                  <PaintbrushIcon size={20} className="relative z-10" />
+                  <Settings2Icon size={20} className="relative z-10" />
+                  {!seenFeatures['settings'] && (
+                    <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full z-20 animate-pulse border-2 border-background" />
+                  )}
                 </button>
-
-                <ThemeCustomizer isOpen={isCustomizing} onClose={() => setIsCustomizing(false)} />
               </motion.nav>
             ) : (
-              // ----------------------------------------------------------------------
-              // CREATIVE STUDIO MODE (Expanded)
-              // ----------------------------------------------------------------------
               <motion.div
                 key="studio"
                 initial={{ opacity: 0, scale: 0.98, filter: "blur(10px)" }}
@@ -312,7 +317,6 @@ const BottomMenu = () => {
                 transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
                 className="flex flex-col p-4 gap-6 w-full"
               >
-                {/* Top Row: Input */}
                 <div className="flex flex-col gap-2">
                   <div className="flex items-start gap-4">
                     <div className="flex-1 relative pt-1">
@@ -327,12 +331,10 @@ const BottomMenu = () => {
                         className="w-full bg-transparent border-none resize-none outline-none text-xl leading-relaxed min-h-[60px] pl-10 placeholder:text-muted-foreground/40 font-medium"
                         onKeyDown={(e) => {
                           if (e.key === 'Escape') setIsCreativeMode(false);
-                          // Submit logic could go here
                         }}
                       />
                     </div>
 
-                    {/* Action Buttons: Close & Generate */}
                     <div className="flex flex-col gap-2 shrink-0">
                       <Button
                         size="icon"
@@ -369,12 +371,8 @@ const BottomMenu = () => {
                   )}
                 </div>
 
-                {/* Bottom Row: Controls */}
                 <div className="flex items-center justify-between gap-4 pt-2 border-t border-border/40">
-
-                  {/* Left Controls */}
                   <div className="flex items-center gap-2 overflow-x-auto no-scrollbar mask-gradient-right pb-1 -mb-1">
-                    {/* Model Selector */}
                     <button className="flex items-center gap-2 h-9 px-3 rounded-xl bg-accent/50 hover:bg-accent text-xs font-medium transition-colors whitespace-nowrap">
                       <span className="w-2 h-2 rounded-full bg-green-500" />
                       {MODELS[0]}
@@ -383,7 +381,6 @@ const BottomMenu = () => {
 
                     <div className="w-px h-6 bg-border/60 mx-1" />
 
-                    {/* Aspect Ratio */}
                     <button
                       className="flex items-center gap-2 h-9 px-3 rounded-xl hover:bg-accent/50 text-xs font-medium transition-colors text-muted-foreground hover:text-foreground whitespace-nowrap"
                       onClick={() => {
@@ -395,13 +392,11 @@ const BottomMenu = () => {
                       {aspectRatio}
                     </button>
 
-                    {/* Quality/Zap */}
                     <button className="flex items-center gap-2 h-9 px-3 rounded-xl hover:bg-accent/50 text-xs font-medium transition-colors text-muted-foreground hover:text-foreground whitespace-nowrap">
                       <ZapIcon size={14} />
                       HD
                     </button>
 
-                    {/* Batch Count */}
                     <div className="flex items-center gap-1 h-9 px-2 rounded-xl bg-muted/30">
                       <button
                         onClick={() => count > 1 && setCount(c => c - 1)}
@@ -419,7 +414,6 @@ const BottomMenu = () => {
                     </div>
                   </div>
 
-                  {/* Generate Button (Main Action) */}
                   <Button
                     size="lg"
                     className="h-11 rounded-xl px-6 bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/25 font-semibold text-sm shrink-0"
@@ -428,12 +422,12 @@ const BottomMenu = () => {
                     Generate
                     <Wand2Icon className="ml-2 h-4 w-4" />
                   </Button>
-
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
         </motion.div>
+        <ThemeCustomizer isOpen={isCustomizing} onClose={() => setIsCustomizing(false)} />
       </div>
     </div>
   );

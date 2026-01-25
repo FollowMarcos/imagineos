@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { X, RotateCcw, Paintbrush } from "lucide-react";
+import { X, RotateCcw, Settings2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCustomTheme } from "@/context/custom-theme-context";
 import { motion, AnimatePresence } from "motion/react";
@@ -20,8 +20,8 @@ export function ThemeCustomizer({ isOpen, onClose }: { isOpen: boolean; onClose:
                 >
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                            <Paintbrush size={18} className="text-primary" />
-                            <h3 className="font-bold text-lg">Customize</h3>
+                            <Settings2Icon size={18} className="text-primary" />
+                            <h3 className="font-bold text-lg">Settings</h3>
                         </div>
                         <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full h-8 w-8">
                             <X size={16} />
