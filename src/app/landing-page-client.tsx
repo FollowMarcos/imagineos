@@ -15,6 +15,7 @@ export default function LandingPageClient() {
             provider,
             options: {
                 redirectTo: `${location.origin}/auth/callback`,
+                scopes: provider === 'x' ? 'users.read email' : undefined,
             },
         })
     }
