@@ -11,9 +11,8 @@ export default function LandingPageClient() {
 
     const handleLogin = async (provider: 'google' | 'x') => {
         const supabase = createClient()
-        const providerName = provider === 'x' ? 'twitter' : provider
         await supabase.auth.signInWithOAuth({
-            provider: providerName,
+            provider,
             options: {
                 // Using the shortest possible callback URL to minimize state JWT length
                 redirectTo: `${location.origin}/c`,
